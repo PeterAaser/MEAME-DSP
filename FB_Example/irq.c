@@ -19,7 +19,6 @@ Uint32 stim_req;
 
 // Mailbox write interrupt
 // use "#define USE_MAILBOX_IRQ" in global.h to enable this interrupt
-
 interrupt void interrupt8(void)
 {
   reg_written = READ_REGISTER(0x428);
@@ -33,7 +32,6 @@ interrupt void interrupt8(void)
     WRITE_REGISTER(0x100C, stim_req);
     stimPack(stim_req);
   }
-
 }
 
 // FPGA data available (do not use)
