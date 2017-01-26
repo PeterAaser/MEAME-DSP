@@ -42,6 +42,7 @@ void setup()
   threshold = READ_REGISTER(0x1000);
   deadtime  = READ_REGISTER(0x1004);
 
+  // TODO these are mailbox registers, figure out what's going on
   StimAmplitude = READ_REGISTER(0x1008);
   StimPeriod    = READ_REGISTER(0x100c);
   StimRepeats   = READ_REGISTER(0x1010);

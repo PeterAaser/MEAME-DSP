@@ -21,7 +21,6 @@ void UploadSine(int Channel, int Amplitude, int Period, int Repeats, int Stepsiz
   for (i = 0; i < Period; i++)
     {
       y = Amplitude * sin((((double)i)/Period)*2*3.1415);
-      //		y = -(Amplitude *i)/Period;
 
       if (abs(y - yold) > Stepsize)
         {
