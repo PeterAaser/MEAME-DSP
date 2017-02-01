@@ -4,9 +4,8 @@ void stimPack(Uint32 update);
 
 struct stimulus_group
   {
-    Uint32 DAC;
-    Uint32 n_electrodes;
-    Uint32 electrodes[64];
+    Uint32 DAC; //id
+    Uint32 electrodes[2];
     Uint32 period;
     Uint32 tick;
     Uint32 sample;

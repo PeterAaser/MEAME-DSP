@@ -2,6 +2,8 @@
 
 void SetupTrigger()
 {
+
+  // Some confusion here as these registers are mentioned twice
   WRITE_REGISTER(0x0200, 0x1);  // Enable Trigger Packets
   WRITE_REGISTER(0x0204, 0x0);  // Setup Trigger
   WRITE_REGISTER(0x0208, 0x0);  // Setup Trigger
