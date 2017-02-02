@@ -90,7 +90,6 @@ void configure_electrodes(stimulus_group** stimulus_groups)
         }
     }
 
-  // Write electrode enable, DAC select and mode
   write_segment( ELECTRODE_ENABLE, 2, stimulus_enable_mask);
   write_segment( ELECTRODE_DAC_SEL, 4, DAC_select_mask);
   write_segment( ELECTRODE_MODE, 4, electrode_configuration_mask);
@@ -110,16 +109,28 @@ void fire_trigger(int trigger)
 }
 
 
-void read_stim_req()
+int read_stim_req()
 {
-  Uint32 request_id = READ_REGISTER( REQUEST_ID );
-  Uint32 DAC        = READ_REGISTER( REQUEST_ID );
-  Uint32 period     = READ_REGISTER( REQUEST_ID );
-  Uint32 tick       = READ_REGISTER( REQUEST_ID );
-  Uint32 sample     = READ_REGISTER( REQUEST_ID );
+  Uint32 DAC        = READ_REGISTER( DAC_ID );
+
+  stimulus_group s = stimulus_groups[DAC];
+
+  s.sample          = READ_REGISTER( SAMPLE );
+  s.period          = READ_REGISTER( PERIOD );
+  s.tick            = (s.tick >= s.period) ? 0 : s.tick;
+
+  read_segment( ELECTRODES, 2, s.electrodes );
+
+  return 1;
 }
 
 
+
+
+
+////////////////////////////////////////
+////////////////////////////////////////
+//// old shit
 void stimPack(Uint32 update){
 
   static int stimuliPeriod = 50000/4;
@@ -133,8 +144,6 @@ void stimPack(Uint32 update){
     }
     return;
   }
-  ////////////////////////////////////////
-  ////////////////////////////////////////
 
   if(stimuliCounter >= stimuliPeriod){
     stimuliCounter = 0;

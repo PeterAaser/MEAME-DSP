@@ -7,12 +7,29 @@
  */
 
 
+////////////////////////////////////////
+////////////////////////////////////////
+////////////////////////////////////////
+///// MAILBOX
 #define MAIL_BASE           (0x1000)
 #define REQUEST_ID          (MAIL_BASE)
-#define STIM_FREQ_REQ       (MAIL_BASE + 0x8)
-#define STIM_ELECTRODE_REQ  (MAIL_BASE + 0xc)
-#define STIM_DAC_GROUP      (MAIL_BASE + 0x10)
 
+#define DAC_ID              (MAIL_BASE + 0x8)
+
+#define ELECTRODES          (MAIL_BASE + 0xc)
+#define ELECTRODES1         (MAIL_BASE + 0xc)
+#define ELECTRODES2         (MAIL_BASE + 0x10)
+
+#define PERIOD              (MAIL_BASE + 0x14)
+#define SAMPLE              (MAIL_BASE + 0x18)
+
+#define REQUEST_ACK         (MAIL_BASE + 0x1c)
+
+
+////////////////////////////////////////
+////////////////////////////////////////
+////////////////////////////////////////
+///// MEMES
 #define STIM_BASE           (0x9000)
 
 #define ELECTRODE_ENABLE    (STIM_BASE + 0x158)

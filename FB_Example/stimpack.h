@@ -23,6 +23,7 @@ struct stimulus_request
 
 typedef struct stimulus_request stimulus_request;
 
+int read_stim_req();
 
 #define ADD_ELECTRODE 1
 #define REMOVE_ELECTRODE 2
