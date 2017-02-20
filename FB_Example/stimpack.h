@@ -23,9 +23,7 @@ struct stimulus_request
 
 typedef struct stimulus_request stimulus_request;
 
-int read_stim_req();
-
-#define ADD_ELECTRODE 1
-#define REMOVE_ELECTRODE 2
-#define CHANGE_PERIOD 3
-#define CHANGE_SAMPLE 4
+int read_stim_request();
+void run_stimpack();
+void dump_stim_group(Uint32 group);
+void setup_stimpack();

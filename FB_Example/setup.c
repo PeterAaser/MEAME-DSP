@@ -1,9 +1,10 @@
 #include "setup.h"
+#include "registers.h"
+#include "stimpack.h"
 
 void SetupTrigger()
 {
 
-  // Some confusion here as these registers are mentioned twice
   WRITE_REGISTER(0x0200, 0x1);  // Enable Trigger Packets
   WRITE_REGISTER(0x0204, 0x0);  // Setup Trigger
   WRITE_REGISTER(0x0208, 0x0);  // Setup Trigger
@@ -66,5 +67,10 @@ void setup()
   WRITE_REGISTER(0x0310, 0x0); // set AUX 1 to value 0
 
   SetupTrigger();
+
+  WRITE_REGISTER( ELECTRODES1, 0x0 );
+  WRITE_REGISTER( ELECTRODES2, 0x0 );
+
+  setup_stimpack();
 
 }

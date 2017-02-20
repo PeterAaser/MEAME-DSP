@@ -1,4 +1,4 @@
-#include <stdio.h>
+// #include <stdio.h>
 #include <string.h>
 
 #include <cslr_pllc.h>
@@ -24,6 +24,7 @@ extern void intcVectorTable(void);
 #include "stimulus.h"
 #include "stimpack.h"
 #include "version.h"
+#include "registers.h"
 #include "MEA21_lib.h"
 
 char dsp_version[] = "(>)"SW_STRING"(<)";

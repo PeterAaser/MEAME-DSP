@@ -13,7 +13,7 @@ void configure_electrode_group(stimulus_group* stimulus_group,
                                Uint32 electrode_configuration_mask[]);
 
 // aggregate configuration data for all groups, upload new config
-void configure_electrodes(stimulus_group** stimulus_groups);
+void configure_electrodes(stimulus_group* stimulus_groups);
 
 // fire main cannons.
 void trigger_stimulus_group(stimulus_group* stimulus_group);
@@ -24,7 +24,16 @@ void fire_trigger(int trigger);
 // "A static field is only visible in the file it is declared in"
 static stimulus_group stimulus_groups[3];
 
+void run_stimpack()
+{
+  int ii;
+  for(ii = 0; ii < 3; ii++)
+    {
+      update_electrode_group(&stimulus_groups[ii]);
+    }
 
+  return;
+}
 
 void update_electrode_group(stimulus_group* stimulus_group)
 {
@@ -71,24 +80,37 @@ void configure_electrode_group(stimulus_group* stimulus_group,
 
 
 // Enables and configures electrodes
-void configure_electrodes(stimulus_group** stimulus_groups)
+void configure_electrodes(stimulus_group stimulus_groups[])
 {
   Uint32 stimulus_enable_mask[2] = {0};
   Uint32 DAC_select_mask[4] = {0};
   Uint32 electrode_configuration_mask[4] = {0};
 
+  WRITE_REGISTER( DEBUG5, 0x1 );
+
   // For each electrode group get the configuration
-  int ii;
+  Uint32 ii;
   for (ii = 0; ii < 3; ii++)
     {
-      if(stimulus_groups[ii] != NULL)
-        {
-          configure_electrode_group(stimulus_groups[ii],
-                                    stimulus_enable_mask,
-                                    DAC_select_mask,
-                                    electrode_configuration_mask);
-        }
+      {
+        // Instead of letting * and & have a tug of war.
+        stimulus_group group = stimulus_groups[ii];
+
+        WRITE_REGISTER( DEBUG6, ii );
+
+        configure_electrode_group(&group,
+                                  stimulus_enable_mask,
+                                  DAC_select_mask,
+                                  electrode_configuration_mask);
+      }
     }
+
+  WRITE_REGISTER( DEBUG7, 0x1);
+
+  WRITE_REGISTER( DEBUG8, stimulus_enable_mask[0]);
+  WRITE_REGISTER( DEBUG9, stimulus_enable_mask[1]);
+
+
 
   write_segment( ELECTRODE_ENABLE, 2, stimulus_enable_mask);
   write_segment( ELECTRODE_DAC_SEL, 4, DAC_select_mask);
@@ -109,93 +131,45 @@ void fire_trigger(int trigger)
 }
 
 
-int read_stim_req()
+int read_stim_request()
 {
-  Uint32 DAC        = READ_REGISTER( DAC_ID );
+  Uint32 DAC = READ_REGISTER( DAC_ID );
 
-  stimulus_group s = stimulus_groups[DAC];
+  // stimulus_group* s = &(stimulus_groups[DAC]);
 
-  s.sample          = READ_REGISTER( SAMPLE );
-  s.period          = READ_REGISTER( PERIOD );
-  s.tick            = (s.tick >= s.period) ? 0 : s.tick;
+  stimulus_groups[DAC].sample          = READ_REGISTER( SAMPLE );
+  stimulus_groups[DAC].period          = READ_REGISTER( PERIOD );
+  stimulus_groups[DAC].tick            = (stimulus_groups[DAC].tick >= stimulus_groups[DAC].period) ? 0 : stimulus_groups[DAC].tick;
 
-  read_segment( ELECTRODES, 2, s.electrodes );
+  read_segment( ELECTRODES, 2, stimulus_groups[DAC].electrodes );
+
+  WRITE_REGISTER( DEBUG4, 1 );
+
+  configure_electrodes(stimulus_groups);
 
   return 1;
 }
 
+void dump_stim_group(Uint32 group)
+{
+  WRITE_REGISTER( DEBUG4, stimulus_groups[group - 1].DAC );
+  WRITE_REGISTER( DEBUG5, stimulus_groups[group - 1].electrodes[0] );
+  WRITE_REGISTER( DEBUG6, stimulus_groups[group - 1].electrodes[1] );
+  WRITE_REGISTER( DEBUG7, stimulus_groups[group - 1].period );
+  WRITE_REGISTER( DEBUG8, stimulus_groups[group - 1].tick );
+  WRITE_REGISTER( DEBUG9, stimulus_groups[group - 1].sample );
+}
 
-
-
-
-////////////////////////////////////////
-////////////////////////////////////////
-//// old shit
-void stimPack(Uint32 update){
-
-  static int stimuliPeriod = 50000/4;
-  static int stimuliCounter = 10;
-  static int segment = 0;
-
-  if(update){
-    stimuliPeriod = update;
-    if(stimuliCounter > stimuliPeriod){
-      stimuliCounter = stimuliPeriod - 1;
+void setup_stimpack()
+{
+  int ii = 0;
+  for (ii = 0; ii < 3; ii++)
+    {
+      stimulus_groups[ii].DAC = ii;
+      stimulus_groups[ii].electrodes[0] = 0;
+      stimulus_groups[ii].electrodes[1] = 0;
+      stimulus_groups[ii].period = 0x10000;
+      stimulus_groups[ii].tick = 0;
+      stimulus_groups[ii].sample = 0;
     }
-    return;
-  }
-
-  if(stimuliCounter >= stimuliPeriod){
-    stimuliCounter = 0;
-
-    int enable;
-    int mux;
-    int config;
-
-    StimulusEnable[0] = 0;
-    StimulusEnable[1] = 0;
-
-    DAC_select[0] = 0;
-    DAC_select[1] = 0;
-    DAC_select[2] = 0;
-    DAC_select[3] = 0;
-
-    elec_config[0] = 0;
-    elec_config[1] = 0;
-    elec_config[2] = 0;
-    elec_config[3] = 0;
-
-
-    int electrode;
-    for (electrode = 0; electrode < HS1_CHANNELS/4; electrode++) // HS1_CHANNELS <- 120
-      {
-
-        enable = 1;
-        mux = 1; // Stimulation Source is DAC 1
-        config = 0; // Use Sidestream 1 for Stimulation Switch
-
-        StimulusEnable[electrode/30] |= (enable << electrode%30);
-        DAC_select[electrode/15] |= (mux << 2*(electrode%15));
-        elec_config[electrode/15] |= (config << 2*(electrode%15));
-      }
-
-    for (electrode = 0; electrode < 2; electrode++)
-      {
-        WRITE_REGISTER(0x9158+electrode*4, StimulusEnable[electrode]); // Enable Stimulation on STG
-      }
-
-    for (electrode = 0; electrode < 4; electrode++)
-      {
-        WRITE_REGISTER(0x9160+electrode*4, DAC_select[electrode]);  // Select DAC 1 for Stimulation Electrodes
-        WRITE_REGISTER(0x9120+electrode*4, elec_config[electrode]); // Configure Stimulation Electrodes to Listen to Sideband 1
-      }
-
-    WRITE_REGISTER(0x0218, segment << 16);  // select segment for trigger 1
-    WRITE_REGISTER(0x0214, 0x00010001);     // Start Trigger 1
-    segment = 1 - segment; // alternate between segment 0 and 1
-
-  }
-  else {
-    stimuliCounter++;
-  }
 }

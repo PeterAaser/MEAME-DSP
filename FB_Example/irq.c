@@ -23,19 +23,22 @@ Uint32 stim_req;
 // use "#define USE_MAILBOX_IRQ" in global.h to enable this interrupt
 interrupt void interrupt8(void)
 {
-
   static Uint32 req_id = 0;
+  req_id++;
 
-  reg_written_address = READ_REGISTER(0x428);
-  reg_value   = READ_REGISTER(0x1000 + reg_written_address);
+  reg_written_address = (READ_REGISTER(0x428)) + 0x1000;
+  reg_value           = READ_REGISTER(reg_written_address);
 
-  if(reg_written_address == 0x0){
-    req_id = reg_value;
-    if(read_stim_req())
-      {
-        WRITE_REGISTER( REQUEST_ACK, req_id );
-      }
+
+  if(reg_written_address == REQUEST_ID){
+    read_stim_request();
+    WRITE_REGISTER(REQUEST_ACK, reg_value);
   }
+
+  if(reg_written_address == DUMP_STIM_GROUP)
+    {
+      dump_stim_group(reg_value);
+    }
 }
 
 // FPGA data available (do not use)
@@ -54,7 +57,7 @@ interrupt void interrupt6(void)
 {
 
 
-  stimPack(0);
+  run_stimpack();
 
 
 // Lots of bullshit that I have no clue what does

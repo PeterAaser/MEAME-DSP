@@ -32,3 +32,12 @@ void write_segment(Uint32 start, int writes, Uint32* send)
       WRITE_REGISTER((start + (ii*4)), send[ii]);
     }
 }
+
+void write_byte_segment(Uint32 start, int writes, char* send)
+{
+  int ii;
+  for (ii = 0; ii < writes; ii++)
+    {
+      WRITE_REGISTER((start + ii), send[ii]);
+    }
+}
