@@ -86,8 +86,6 @@ void configure_electrodes(stimulus_group stimulus_groups[])
   Uint32 DAC_select_mask[4] = {0};
   Uint32 electrode_configuration_mask[4] = {0};
 
-  WRITE_REGISTER( DEBUG5, 0x1 );
-
   // For each electrode group get the configuration
   Uint32 ii;
   for (ii = 0; ii < 3; ii++)
@@ -96,20 +94,12 @@ void configure_electrodes(stimulus_group stimulus_groups[])
         // Instead of letting * and & have a tug of war.
         stimulus_group group = stimulus_groups[ii];
 
-        WRITE_REGISTER( DEBUG6, ii );
-
         configure_electrode_group(&group,
                                   stimulus_enable_mask,
                                   DAC_select_mask,
                                   electrode_configuration_mask);
       }
     }
-
-  WRITE_REGISTER( DEBUG7, 0x1);
-
-  WRITE_REGISTER( DEBUG8, stimulus_enable_mask[0]);
-  WRITE_REGISTER( DEBUG9, stimulus_enable_mask[1]);
-
 
 
   write_segment( ELECTRODE_ENABLE, 2, stimulus_enable_mask);
@@ -135,15 +125,11 @@ int read_stim_request()
 {
   Uint32 DAC = READ_REGISTER( DAC_ID );
 
-  // stimulus_group* s = &(stimulus_groups[DAC]);
-
   stimulus_groups[DAC].sample          = READ_REGISTER( SAMPLE );
   stimulus_groups[DAC].period          = READ_REGISTER( PERIOD );
   stimulus_groups[DAC].tick            = (stimulus_groups[DAC].tick >= stimulus_groups[DAC].period) ? 0 : stimulus_groups[DAC].tick;
 
   read_segment( ELECTRODES, 2, stimulus_groups[DAC].electrodes );
-
-  WRITE_REGISTER( DEBUG4, 1 );
 
   configure_electrodes(stimulus_groups);
 
@@ -158,6 +144,7 @@ void dump_stim_group(Uint32 group)
   WRITE_REGISTER( DEBUG7, stimulus_groups[group - 1].period );
   WRITE_REGISTER( DEBUG8, stimulus_groups[group - 1].tick );
   WRITE_REGISTER( DEBUG9, stimulus_groups[group - 1].sample );
+  WRITE_REGISTER( DEBUG10, 0xAA);
 }
 
 void setup_stimpack()

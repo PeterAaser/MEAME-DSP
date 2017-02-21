@@ -57,7 +57,7 @@ interrupt void interrupt6(void)
 {
 
 
-  run_stimpack();
+  // run_stimpack();
 
 
 // Lots of bullshit that I have no clue what does
