@@ -34,10 +34,6 @@ CSL_GpioRegsOvly gpioRegs = (CSL_GpioRegsOvly)CSL_GPIO_0_REGS;
 
 void main()
 {
-  static int count = 0;
-  int count_test1;
-  int count_test2;
-
   static int value = 0;
   volatile int i;
 

@@ -39,9 +39,24 @@
 #define DEBUG8             (DEBUG5 + 0xc)
 #define DEBUG9             (DEBUG6 + 0xc)
 
-#define DEBUG10             (DEBUG7 + 0xc)
-#define DEBUG11             (DEBUG8 + 0xc)
-#define DEBUG12             (DEBUG9 + 0xc)
+#define DEBUG10            (DEBUG7 + 0xc)
+#define DEBUG11            (DEBUG8 + 0xc)
+#define DEBUG12            (DEBUG9 + 0xc)
+
+#define DEBUG_DAC_SEL11     (DEBUG12 + 0x4)
+#define DEBUG_DAC_SEL12     (DEBUG12 + 0x8)
+#define DEBUG_DAC_SEL13     (DEBUG12 + 0xc)
+#define DEBUG_DAC_SEL14     (DEBUG12 + 0x10)
+
+#define DEBUG_DAC_SEL21     (DEBUG_DAC_SEL14 + 0x4)
+#define DEBUG_DAC_SEL22     (DEBUG_DAC_SEL14 + 0x8)
+#define DEBUG_DAC_SEL23     (DEBUG_DAC_SEL14 + 0xc)
+#define DEBUG_DAC_SEL24     (DEBUG_DAC_SEL14 + 0x10)
+
+#define DEBUG_DAC_SEL31     (DEBUG_DAC_SEL24 + 0x4)
+#define DEBUG_DAC_SEL32     (DEBUG_DAC_SEL24 + 0x8)
+#define DEBUG_DAC_SEL33     (DEBUG_DAC_SEL24 + 0xc)
+#define DEBUG_DAC_SEL34     (DEBUG_DAC_SEL24 + 0x10)
 
 ////////////////////////////////////////
 ////////////////////////////////////////

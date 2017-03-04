@@ -42,7 +42,6 @@ void UploadSine(int Channel, int Amplitude, int Period, int Repeats, int Stepsiz
   vectors_used = 0;
   vectors_used += AddDataPoint(Channel+1, Period, 0x0019);
   AddLoop(Channel+1, vectors_used, Repeats);
-  //	AddDataPoint(Channel+1, 10, 0x0009); // keep Electrode connected to ground after stimulation
 }
 
 void AddLoop(int Channel, int Vectors, int Repeats)

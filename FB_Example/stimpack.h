@@ -9,6 +9,7 @@ struct stimulus_group
     Uint32 period;
     Uint32 tick;
     Uint32 sample;
+    Uint32 fires;
   };
 
 typedef struct stimulus_group stimulus_group;

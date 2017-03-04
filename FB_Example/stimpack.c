@@ -2,6 +2,9 @@
 #include "registers.h"
 #include "util.h"
 
+#define MANUAL 0
+#define AUTO 3
+
 
 // basic tick book-keeping
 void update_electrode_group(stimulus_group* stimulus_group);
@@ -26,6 +29,7 @@ static stimulus_group stimulus_groups[3];
 
 void run_stimpack()
 {
+
   int ii;
   for(ii = 0; ii < 3; ii++)
     {
@@ -41,6 +45,7 @@ void update_electrode_group(stimulus_group* stimulus_group)
     {
       stimulus_group->tick = 0;
       trigger_stimulus_group(stimulus_group);
+      stimulus_group->fires++;
     }
   else
     {
@@ -54,7 +59,9 @@ void configure_electrode_group(stimulus_group* stimulus_group,
                                Uint32 DAC_select_mask[],
                                Uint32 electrode_configuration_mask[])
 {
-  int mux = stimulus_group->DAC;
+  // int mux = stimulus_group->DAC;
+  // int config = 0;
+  int mux = 1;
   int config = 0;
 
   int electrode_address;
@@ -65,12 +72,13 @@ void configure_electrode_group(stimulus_group* stimulus_group,
         {
           if(get_bit32(stimulus_group->electrodes[ii], electrode_address))
             {
-              int a = electrode_address*ii;
-              DAC_select_mask[a/15]              |=   (mux << 2*(a%15));
-              electrode_configuration_mask[a/15] |=   (config << 2*(a%15));
+              int a = electrode_address + (ii * 30);
+              DAC_select_mask[a/15]              |=   ( mux << ( (2 * a) % 30) );
+              electrode_configuration_mask[a/15] |=   (config << ( (2 * a) % 30) );
             }
         }
     }
+
 
   stimulus_enable_mask[0] |= stimulus_group->electrodes[0];
   stimulus_enable_mask[1] |= stimulus_group->electrodes[1];
@@ -90,15 +98,18 @@ void configure_electrodes(stimulus_group stimulus_groups[])
   Uint32 ii;
   for (ii = 0; ii < 3; ii++)
     {
-      {
-        // Instead of letting * and & have a tug of war.
-        stimulus_group group = stimulus_groups[ii];
 
-        configure_electrode_group(&group,
-                                  stimulus_enable_mask,
-                                  DAC_select_mask,
-                                  electrode_configuration_mask);
-      }
+      stimulus_group group = stimulus_groups[ii];
+
+      configure_electrode_group(&group,
+                                stimulus_enable_mask,
+                                DAC_select_mask,
+                                electrode_configuration_mask);
+
+      WRITE_REGISTER( (DEBUG_DAC_SEL11 + 4*ii), DAC_select_mask[0]);
+      WRITE_REGISTER( (DEBUG_DAC_SEL12 + 4*ii), DAC_select_mask[1]);
+      WRITE_REGISTER( (DEBUG_DAC_SEL13 + 4*ii), DAC_select_mask[2]);
+      WRITE_REGISTER( (DEBUG_DAC_SEL14 + 4*ii), DAC_select_mask[3]);
     }
 
 
@@ -111,13 +122,22 @@ void configure_electrodes(stimulus_group stimulus_groups[])
 
 void trigger_stimulus_group(stimulus_group* stimulus_group)
 {
+  // TODO this is wrong (but the method it calls is also wrong, and has been hardcoded to be "correct")
   fire_trigger(stimulus_group->DAC);
 }
 
 
 void fire_trigger(int trigger)
 {
-  WRITE_REGISTER( MANUAL_TRIGGER, (1 << trigger));
+  // TODO this is wrong
+  // WRITE_REGISTER( MANUAL_TRIGGER, (1 << trigger));
+  // configure_electrodes(stimulus_groups);
+
+  // MCS code
+  static int segment = 0;
+  WRITE_REGISTER(0x0218, segment << 16);  // select segment for trigger 1
+  WRITE_REGISTER(0x0214, 0x00010001);     // Start Trigger 1
+  // segment = 1 - segment;
 }
 
 
@@ -144,7 +164,7 @@ void dump_stim_group(Uint32 group)
   WRITE_REGISTER( DEBUG7, stimulus_groups[group - 1].period );
   WRITE_REGISTER( DEBUG8, stimulus_groups[group - 1].tick );
   WRITE_REGISTER( DEBUG9, stimulus_groups[group - 1].sample );
-  WRITE_REGISTER( DEBUG10, 0xAA);
+  WRITE_REGISTER( DEBUG10, stimulus_groups[group - 1].fires );
 }
 
 void setup_stimpack()
@@ -155,8 +175,9 @@ void setup_stimpack()
       stimulus_groups[ii].DAC = ii;
       stimulus_groups[ii].electrodes[0] = 0;
       stimulus_groups[ii].electrodes[1] = 0;
-      stimulus_groups[ii].period = 0x10000;
+      stimulus_groups[ii].period = 0x100000;
       stimulus_groups[ii].tick = 0;
       stimulus_groups[ii].sample = 0;
+      stimulus_groups[ii].fires = 0;
     }
 }

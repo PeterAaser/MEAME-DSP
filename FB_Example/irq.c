@@ -8,6 +8,7 @@
 
 #include "main.h"
 #include "stimpack.h"
+#include "old_stim.h"
 #include "registers.h"
 #include "irq.h"
 #include "MEA21_lib.h"
@@ -15,16 +16,34 @@
 int num_tr_cross[HS1_CHANNELS/2];
 int last_tr_cross[HS1_CHANNELS/2];
 
+// delet this
+Uint32 reg_written;
+
 Uint32 reg_written_address;
 Uint32 reg_value;
 Uint32 stim_req;
 
 // Mailbox write interrupt
 // use "#define USE_MAILBOX_IRQ" in global.h to enable this interrupt
+
+
 interrupt void interrupt8(void)
 {
-  static Uint32 req_id = 0;
-  req_id++;
+
+  // reg_written = READ_REGISTER(0x428);
+  // reg_value   = READ_REGISTER(0x1000 + reg_written);
+
+  // threshold = READ_REGISTER(0x1000);
+  // deadtime  = READ_REGISTER(0x1004);
+
+  // if(reg_written == 0x8){
+  //   stim_req = READ_REGISTER(0x1008);
+  //   WRITE_REGISTER(0x100C, stim_req);
+  //   oldStimPack(stim_req);
+  // }
+
+  // static Uint32 req_id = 0;
+  // req_id++;
 
   reg_written_address = (READ_REGISTER(0x428)) + 0x1000;
   reg_value           = READ_REGISTER(reg_written_address);
@@ -39,6 +58,7 @@ interrupt void interrupt8(void)
     {
       dump_stim_group(reg_value);
     }
+
 }
 
 // FPGA data available (do not use)
@@ -57,7 +77,6 @@ interrupt void interrupt6(void)
 {
 
 
-  // run_stimpack();
 
 
 // Lots of bullshit that I have no clue what does
@@ -65,9 +84,7 @@ interrupt void interrupt6(void)
 ////////////////////////////////////////
 ////////////////////////////////////////
   static int timestamp = 0;
-  static int segment = 0;
 
-  int i;
   CSL_Edma3ccRegsOvly edma3ccRegs = (CSL_Edma3ccRegsOvly)CSL_EDMA3CC_0_REGS;
 
   Int32* restrict adc_i_p = &adc_intern[0];
@@ -95,6 +112,9 @@ interrupt void interrupt6(void)
   WRITE_REGISTER(0x0310, 0x0);
 
   timestamp++;
+
+  // oldStimPack(0);
+  run_stimpack();
 
   ////////////////////////////////////////
   ////////////////////////////////////////
