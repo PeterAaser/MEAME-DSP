@@ -42,16 +42,17 @@ void setup()
 
   WRITE_REGISTER(0x318, 0x1);  // set AUX 1 as output
 
-  threshold = READ_REGISTER(0x1000);
-  deadtime  = READ_REGISTER(0x1004);
+  // Todo this should be a little smarter...
+  StimAmplitude = 100;
+  StimPeriod    = 1000;
+  StimRepeats   = 1;
+  StimStepsize  = 10;
 
-  // TODO these are mailbox registers, figure out what's going on
-  StimAmplitude = READ_REGISTER(0x1008);
-  StimPeriod    = READ_REGISTER(0x100c);
-  StimRepeats   = READ_REGISTER(0x1010);
-  StimStepsize  = READ_REGISTER(0x1014);
 
+  // Set bit 28 to 1
 //	WRITE_REGISTER(0x9200, 0x10000000; // Inititialze STG Memory, use only one segment
+
+  // Set bit 29 to 1
   WRITE_REGISTER(0x9200, 0x20000000); // Inititialze STG Memory, use 256 segments
 
   WRITE_REGISTER(0x0310, 0x0); // set AUX 1 to value 0

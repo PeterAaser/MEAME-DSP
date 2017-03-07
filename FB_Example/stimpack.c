@@ -129,15 +129,16 @@ void trigger_stimulus_group(stimulus_group* stimulus_group)
 
 void fire_trigger(int trigger)
 {
-  // TODO this is wrong
-  // WRITE_REGISTER( MANUAL_TRIGGER, (1 << trigger));
-  // configure_electrodes(stimulus_groups);
+  static Uint32 triggers_fired = 0;
+  triggers_fired++;
 
   // MCS code
   static int segment = 0;
   WRITE_REGISTER(0x0218, segment << 16);  // select segment for trigger 1
   WRITE_REGISTER(0x0214, 0x00010001);     // Start Trigger 1
   // segment = 1 - segment;
+
+  WRITE_REGISTER( DEBUG10, triggers_fired );
 }
 
 

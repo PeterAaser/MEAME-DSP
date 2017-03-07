@@ -61,7 +61,7 @@
 ////////////////////////////////////////
 ////////////////////////////////////////
 ////////////////////////////////////////
-///// MEMES
+///// STG
 #define STIM_BASE          (0x9000)
 
 #define ELECTRODE_ENABLE   (STIM_BASE + 0x158)
@@ -84,6 +84,41 @@
 #define TRIGGER_REPEAT2    (STIM_BASE + 0x194)
 #define TRIGGER_REPEAT3    (STIM_BASE + 0x198)
 
+
+#define STG_MWRITE1  (STIM_BASE + 0xf20)
+#define STG_MWRITE2  (STIM_BASE + 0xf24)
+#define STG_MWRITE3  (STIM_BASE + 0xf28)
+#define STG_MWRITE4  (STIM_BASE + 0xf2c)
+#define STG_MWRITE5  (STIM_BASE + 0xf30)
+#define STG_MWRITE6  (STIM_BASE + 0xf34)
+#define STG_MWRITE7  (STIM_BASE + 0xf38)
+#define STG_MWRITE8  (STIM_BASE + 0xf3c)
+
+
+#define STG_MWRITE1  (STIM_BASE + 0xf20)
+#define STG_MWRITE2  (STIM_BASE + 0xf24)
+#define STG_MWRITE3  (STIM_BASE + 0xf28)
+#define STG_MWRITE4  (STIM_BASE + 0xf2c)
+#define STG_MWRITE5  (STIM_BASE + 0xf30)
+#define STG_MWRITE6  (STIM_BASE + 0xf34)
+#define STG_MWRITE7  (STIM_BASE + 0xf38)
+#define STG_MWRITE8  (STIM_BASE + 0xf3c)
+
+
+#define STG_MCLEAR_AND_WRITE1  (STIM_BASE + 0xf40)
+#define STG_MCLEAR_AND_WRITE2  (STIM_BASE + 0xf44)
+#define STG_MCLEAR_AND_WRITE3  (STIM_BASE + 0xf48)
+#define STG_MCLEAR_AND_WRITE4  (STIM_BASE + 0xf4c)
+#define STG_MCLEAR_AND_WRITE5  (STIM_BASE + 0xf50)
+#define STG_MCLEAR_AND_WRITE6  (STIM_BASE + 0xf54)
+#define STG_MCLEAR_AND_WRITE7  (STIM_BASE + 0xf58)
+#define STG_MCLEAR_AND_WRITE8  (STIM_BASE + 0xf5c)
+
+
+////////////////////////////////////////
+////////////////////////////////////////
+////////////////////////////////////////
+///// TRIGGERS
 
 #define TRIGGER_CTRL_BASE  (0x0200)
 
