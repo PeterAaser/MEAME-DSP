@@ -1,3 +1,5 @@
+#ifndef REGISTERS_H_
+#define REGISTERS_H_
 
 /*
   Some registers are named twice, with and without number prefix.
@@ -12,51 +14,63 @@
 ////////////////////////////////////////
 ///// MAILBOX
 #define MAIL_BASE          (0x1000)
-#define REQUEST_ID         (MAIL_BASE)
 
-#define DAC_ID             (MAIL_BASE + 0x8)
+#define COMMS1             (MAIL_BASE + 0xc)
+#define COMMS2             (MAIL_BASE + 0x10)
+#define COMMS3             (MAIL_BASE + 0x14)
+#define COMMS4             (MAIL_BASE + 0x18)
 
-#define ELECTRODES         (MAIL_BASE + 0xc)
-#define ELECTRODES1        (MAIL_BASE + 0xc)
-#define ELECTRODES2        (MAIL_BASE + 0x10)
+#define COMMS5             (MAIL_BASE + 0x1c)
+#define COMMS6             (MAIL_BASE + 0x20)
 
-#define PERIOD             (MAIL_BASE + 0x14)
-#define SAMPLE             (MAIL_BASE + 0x18)
+#define ERROR              (MAIL_BASE + 0x24)
+#define ERROR_VAL          (MAIL_BASE + 0x28)
 
-#define REQUEST_ACK        (MAIL_BASE + 0x1c)
+#define DEBUG1             (MAIL_BASE + 0x2c)
+#define DEBUG2             (MAIL_BASE + 0x30)
+#define DEBUG3             (MAIL_BASE + 0x34)
+#define DEBUG4             (MAIL_BASE + 0x38)
+#define DEBUG5             (MAIL_BASE + 0x3c)
+#define DEBUG6             (MAIL_BASE + 0x40)
+#define DEBUG7             (MAIL_BASE + 0x44)
+#define DEBUG8             (MAIL_BASE + 0x48)
+#define DEBUG9             (MAIL_BASE + 0x4c)
 
-#define DUMP_STIM_GROUP    (MAIL_BASE + 0x20)
+#define WRITTEN_ADDRESS    (MAIL_BASE + 0x50)
+#define COUNTER            (MAIL_BASE + 0x54)
+#define PING_SEND          (MAIL_BASE + 0x58)
+#define PING_READ          (MAIL_BASE + 0x5c)
 
-#define DEBUG1             (MAIL_BASE + 0x80)
-#define DEBUG2             (MAIL_BASE + 0x84)
-#define DEBUG3             (MAIL_BASE + 0x88)
+#define CLEAR              (MAIL_BASE + 0x60)
 
-#define DEBUG4             (DEBUG1 + 0xc)
-#define DEBUG5             (DEBUG2 + 0xc)
-#define DEBUG6             (DEBUG3 + 0xc)
 
-#define DEBUG7             (DEBUG4 + 0xc)
-#define DEBUG8             (DEBUG5 + 0xc)
-#define DEBUG9             (DEBUG6 + 0xc)
+#define COMMS_BUFFER_MASTER_IDX (MAIL_BASE + 0x64) // MEAME -> DSP
+#define COMMS_BUFFER_SLAVE_IDX  (MAIL_BASE + 0x68) // DSP -> MEAME
+#define COMMS_BUFFER_START      (MAIL_BASE + 0x6c)
 
-#define DEBUG10            (DEBUG7 + 0xc)
-#define DEBUG11            (DEBUG8 + 0xc)
-#define DEBUG12            (DEBUG9 + 0xc)
+// OP TYPE 0x6c
+// OP1     0x70
+// OP2     0x74
 
-#define DEBUG_DAC_SEL11     (DEBUG12 + 0x4)
-#define DEBUG_DAC_SEL12     (DEBUG12 + 0x8)
-#define DEBUG_DAC_SEL13     (DEBUG12 + 0xc)
-#define DEBUG_DAC_SEL14     (DEBUG12 + 0x10)
+// OP TYPE 0x78
+// OP1     0x7c
+// OP2     0x80
 
-#define DEBUG_DAC_SEL21     (DEBUG_DAC_SEL14 + 0x4)
-#define DEBUG_DAC_SEL22     (DEBUG_DAC_SEL14 + 0x8)
-#define DEBUG_DAC_SEL23     (DEBUG_DAC_SEL14 + 0xc)
-#define DEBUG_DAC_SEL24     (DEBUG_DAC_SEL14 + 0x10)
+// OP TYPE 0x84
+// OP1     0x88
+// OP2     0x8c
 
-#define DEBUG_DAC_SEL31     (DEBUG_DAC_SEL24 + 0x4)
-#define DEBUG_DAC_SEL32     (DEBUG_DAC_SEL24 + 0x8)
-#define DEBUG_DAC_SEL33     (DEBUG_DAC_SEL24 + 0xc)
-#define DEBUG_DAC_SEL34     (DEBUG_DAC_SEL24 + 0x10)
+// OP TYPE 0x90
+// OP1     0x94
+// OP2     0x98
+
+// OP TYPE 0x9c
+// OP1     0x100
+// OP2     0x104
+
+// OP TYPE 0x108
+// OP1     0x10c
+// OP2     0x110
 
 ////////////////////////////////////////
 ////////////////////////////////////////
@@ -145,3 +159,5 @@
 #define MANUAL_TRIGGER     (TRIGGER_CTRL_BASE + 0x14)
 
 /* and so on... */
+
+#endif /* REGISTERS_H_ */

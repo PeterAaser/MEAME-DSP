@@ -3,7 +3,7 @@
 
 // #define USE_SIMULATOR
 #define INIT_IRQ
-#define USE_MAILBOX_IRQ
+// #define USE_MAILBOX_IRQ
 
 #include <csl.h>
 

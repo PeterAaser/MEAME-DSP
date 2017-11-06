@@ -1,5 +1,10 @@
 #include "MEA21_lib.h"
 
+
+/**
+   No MCS code to worry about here.
+   Still much worry to be had!
+ */
 void stimPack(Uint32 update);
 
 struct stimulus_group

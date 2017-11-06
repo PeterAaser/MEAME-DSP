@@ -1,5 +1,6 @@
 #include "util.h"
 
+// TODO: Is this MCS shite or is it mine?
 void modifyRegister(Uint32 reg, Uint32 Mask, Uint32 Value)
 {
   Uint32 Temp;
@@ -10,11 +11,16 @@ void modifyRegister(Uint32 reg, Uint32 Mask, Uint32 Value)
   WRITE_REGISTER(reg, Temp);
 }
 
+// TODO: Likewise
 int get_bit32(Uint32 bits, int index)
 {
   return (((bits) >> (index)) & 1);
 }
 
+
+/**
+   Reads 32 bit words from start address into receive buffer
+ */
 void read_segment(Uint32 start, int reads, Uint32* recv)
 {
   int ii;
@@ -24,6 +30,10 @@ void read_segment(Uint32 start, int reads, Uint32* recv)
     }
 }
 
+
+/**
+   Writes 32 bit words to to memory from the send buffer
+*/
 void write_segment(Uint32 start, int writes, Uint32* send)
 {
   int ii;

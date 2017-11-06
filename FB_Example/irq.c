@@ -16,12 +16,16 @@
 int num_tr_cross[HS1_CHANNELS/2];
 int last_tr_cross[HS1_CHANNELS/2];
 
-// delet this
-Uint32 reg_written;
+volatile Uint32 reg_written_address;
+volatile Uint32 reg_value;
 
-Uint32 reg_written_address;
-Uint32 reg_value;
-Uint32 stim_req;
+volatile Uint32 counter = 0;
+volatile Uint32 write_req_id = 0;
+volatile Uint32 write_addr = 0;
+volatile Uint32 write_val = 0;
+volatile Uint32 read_req_id = 0;
+volatile Uint32 read_addr = 0;
+volatile Uint32 read_value = 0;
 
 // Mailbox write interrupt
 // use "#define USE_MAILBOX_IRQ" in global.h to enable this interrupt
@@ -29,36 +33,87 @@ Uint32 stim_req;
 
 interrupt void interrupt8(void)
 {
+#ifdef INTERRUPTS
 
-  // reg_written = READ_REGISTER(0x428);
-  // reg_value   = READ_REGISTER(0x1000 + reg_written);
-
-  // threshold = READ_REGISTER(0x1000);
-  // deadtime  = READ_REGISTER(0x1004);
-
-  // if(reg_written == 0x8){
-  //   stim_req = READ_REGISTER(0x1008);
-  //   WRITE_REGISTER(0x100C, stim_req);
-  //   oldStimPack(stim_req);
-  // }
-
-  // static Uint32 req_id = 0;
-  // req_id++;
-
+  //////////////////////////
+  //////////////////////////
+  ///// DEBUG STUFF
   reg_written_address = (READ_REGISTER(0x428)) + 0x1000;
   reg_value           = READ_REGISTER(reg_written_address);
 
 
-  if(reg_written_address == REQUEST_ID){
-    read_stim_request();
-    WRITE_REGISTER(REQUEST_ACK, reg_value);
+  /**
+     PING TEST
+   */
+  if(reg_written_address == PING_SEND){
+    WRITE_REGISTER(PING_READ, reg_value);
+  }
+  else{
+    WRITE_REGISTER(PING_READ, reg_value);
+  }
+  //////////////////////////
+  //////////////////////////
+
+
+  /**
+     WRITE
+   */
+  if(reg_written_address == WRITE_REQ_ID){
+    write_req_id = READ_REGISTER(reg_written_address);
+    write_addr   = READ_REGISTER(WRITE_ADDRESS);
+    write_val    = READ_REGISTER(WRITE_VALUE);
+
+    WRITE_REGISTER(WRITE_ADDRESS, WRITE_VALUE);
+    WRITE_REGISTER(WRITE_ACK_ID,  write_req_id);
+
+    WRITE_REGISTER(DEBUG7, write_addr);
+    WRITE_REGISTER(DEBUG8, write_val);
+    WRITE_REGISTER(DEBUG9, write_req_id);
   }
 
-  if(reg_written_address == DUMP_STIM_GROUP)
-    {
-      dump_stim_group(reg_value);
-    }
 
+  /**
+     READ
+  */
+  if(reg_written_address == READ_REQ_ID){
+    read_req_id = READ_REGISTER(reg_written_address);
+
+    WRITE_REGISTER(DEBUG3, read_req_id);
+
+    read_addr   = READ_REGISTER(READ_ADDRESS);
+    read_value  = READ_REGISTER(read_addr);
+
+    WRITE_REGISTER(READ_VALUE, read_value);
+    WRITE_REGISTER(READ_ACK_ID, read_req_id);
+  }
+
+
+  /**
+     CLEAR
+   */
+  if(reg_written_address == CLEAR){
+    WRITE_REGISTER(DEBUG1, 0x0);
+    WRITE_REGISTER(DEBUG2, 0x0);
+    WRITE_REGISTER(DEBUG3, 0x0);
+    WRITE_REGISTER(DEBUG4, 0x0);
+    WRITE_REGISTER(DEBUG5, 0x0);
+    WRITE_REGISTER(DEBUG6, 0x0);
+    WRITE_REGISTER(DEBUG7, 0x0);
+    WRITE_REGISTER(DEBUG8, 0x0);
+    WRITE_REGISTER(DEBUG9, 0x0);
+
+    WRITE_REGISTER(READ_ACK_ID,   0x0);
+    WRITE_REGISTER(READ_ADDRESS,  0x0);
+    WRITE_REGISTER(READ_VALUE,    0x0);
+
+    WRITE_REGISTER(WRITE_ACK_ID,  0x0);
+    WRITE_REGISTER(WRITE_ADDRESS, 0x0);
+    WRITE_REGISTER(WRITE_VALUE,   0x0);
+  }
+
+  counter++;
+
+#endif
 }
 
 // FPGA data available (do not use)
@@ -114,7 +169,9 @@ interrupt void interrupt6(void)
   timestamp++;
 
   // oldStimPack(0);
-  run_stimpack();
+
+  //TODO reenable
+  // run_stimpack();
 
   ////////////////////////////////////////
   ////////////////////////////////////////

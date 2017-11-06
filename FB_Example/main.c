@@ -27,6 +27,8 @@ extern void intcVectorTable(void);
 #include "registers.h"
 #include "MEA21_lib.h"
 
+#include "comms.h"
+
 char dsp_version[] = "(>)"SW_STRING"(<)";
 
 CSL_GpioRegsOvly gpioRegs = (CSL_GpioRegsOvly)CSL_GPIO_0_REGS;
@@ -37,16 +39,12 @@ void main()
   static int value = 0;
   volatile int i;
 
-
   MEA21_init();
   setup();
 
+
   while(1)
     {
-      // No idea, maybe a busy loop?
-      WRITE_REGISTER(0x002C, 0x700 + 1*value);
-      for (i = 0; i < 100000; i++);
-      value = 1 - value; // switch on/off
+      execute_instructions();
     }
 }
-
