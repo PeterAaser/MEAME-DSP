@@ -130,14 +130,17 @@ interrupt void interrupt5(void)
 // DMA finished Interrupt
 interrupt void interrupt6(void)
 {
+  // oldStimPack(0);
+
+  //TODO reenable
+  run_stimpack();
 
 
 
-
-// Lots of bullshit that I have no clue what does
-////////////////////////////////////////
-////////////////////////////////////////
-////////////////////////////////////////
+  // Lots of bullshit that I have no clue what does
+  ////////////////////////////////////////
+  ////////////////////////////////////////
+  ////////////////////////////////////////
   static int timestamp = 0;
 
   CSL_Edma3ccRegsOvly edma3ccRegs = (CSL_Edma3ccRegsOvly)CSL_EDMA3CC_0_REGS;
@@ -148,8 +151,8 @@ interrupt void interrupt6(void)
 
   CSL_FINST(edma3ccRegs->ICRH, EDMA3CC_ICRH_I52, CLEAR);
 
+  // AUX data out register
   WRITE_REGISTER(0x0310, 0x1);
-
 
   if ((int)MeaData[HS1_DATA_OFFSET + 0] > (int)threshold)
     {
@@ -165,13 +168,6 @@ interrupt void interrupt6(void)
   CSL_FINST(edma3ccRegs->ESRH, EDMA3CC_ESRH_E53, SET);
 
   WRITE_REGISTER(0x0310, 0x0);
-
-  timestamp++;
-
-  // oldStimPack(0);
-
-  //TODO reenable
-  // run_stimpack();
 
   ////////////////////////////////////////
   ////////////////////////////////////////

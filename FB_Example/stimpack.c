@@ -23,7 +23,6 @@ void trigger_stimulus_group(stimulus_group* stimulus_group);
 void fire_trigger(int trigger);
 
 
-
 // "A static field is only visible in the file it is declared in"
 static stimulus_group stimulus_groups[3];
 
@@ -130,35 +129,33 @@ void fire_trigger(int trigger)
   WRITE_REGISTER(0x0218, segment << 16);  // select segment for trigger 1
   WRITE_REGISTER(0x0214, 0x00010001);     // Start Trigger 1
   // segment = 1 - segment;
-
 }
 
 
 // TODO reenable
-int read_stim_request()
+void read_stim_request(Uint32 DAC)
 {
-  /* Uint32 DAC = READ_REGISTER( DAC_ID ); */
+  stimulus_groups[DAC].sample          = READ_REGISTER( STIMPACK_SAMPLE );
+  stimulus_groups[DAC].period          = READ_REGISTER( STIMPACK_PERIOD );
+  stimulus_groups[DAC].tick            = (stimulus_groups[DAC].tick >= stimulus_groups[DAC].period) ? 0 : stimulus_groups[DAC].tick;
 
-  /* stimulus_groups[DAC].sample          = READ_REGISTER( SAMPLE ); */
-  /* stimulus_groups[DAC].period          = READ_REGISTER( PERIOD ); */
-  /* stimulus_groups[DAC].tick            = (stimulus_groups[DAC].tick >= stimulus_groups[DAC].period) ? 0 : stimulus_groups[DAC].tick; */
+  read_segment( STIMPACK_ELECTRODES0, 2, stimulus_groups[DAC].electrodes );
 
-  /* read_segment( ELECTRODES, 2, stimulus_groups[DAC].electrodes ); */
+  configure_electrodes(stimulus_groups);
 
-  /* configure_electrodes(stimulus_groups); */
-
-  return 1;
+  dump_stim_group(DAC);
 }
 
 void dump_stim_group(Uint32 group)
 {
-  /* WRITE_REGISTER( DEBUG4, stimulus_groups[group - 1].DAC ); */
-  /* WRITE_REGISTER( DEBUG5, stimulus_groups[group - 1].electrodes[0] ); */
-  /* WRITE_REGISTER( DEBUG6, stimulus_groups[group - 1].electrodes[1] ); */
-  /* WRITE_REGISTER( DEBUG7, stimulus_groups[group - 1].period ); */
-  /* WRITE_REGISTER( DEBUG8, stimulus_groups[group - 1].tick ); */
-  /* WRITE_REGISTER( DEBUG9, stimulus_groups[group - 1].sample ); */
-  /* WRITE_REGISTER( DEBUG10, stimulus_groups[group - 1].fires ); */
+  WRITE_REGISTER(STIMPACK_GROUP_DUMPED_GROUP, stimulus_groups[group - 1].DAC );
+  WRITE_REGISTER(STIMPACK_GROUP_DAC,          stimulus_groups[group - 1].DAC );
+  WRITE_REGISTER(STIMPACK_GROUP_ELECTRODES0,  stimulus_groups[group - 1].electrodes[0] );
+  WRITE_REGISTER(STIMPACK_GROUP_ELECTRODES1,  stimulus_groups[group - 1].electrodes[1] );
+  WRITE_REGISTER(STIMPACK_GROUP_PERIOD,       stimulus_groups[group - 1].period );
+  WRITE_REGISTER(STIMPACK_GROUP_TICK,         stimulus_groups[group - 1].tick );
+  WRITE_REGISTER(STIMPACK_GROUP_SAMPLE,       stimulus_groups[group - 1].sample );
+  WRITE_REGISTER(STIMPACK_GROUP_FIRES,        stimulus_groups[group - 1].fires );
 }
 
 void setup_stimpack()

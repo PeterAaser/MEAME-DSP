@@ -29,7 +29,7 @@ struct stimulus_request
 
 typedef struct stimulus_request stimulus_request;
 
-int read_stim_request();
+void read_stim_request();
 void run_stimpack();
 void dump_stim_group(Uint32 group);
 void setup_stimpack();

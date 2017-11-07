@@ -48,29 +48,33 @@
 #define COMMS_BUFFER_SLAVE_IDX  (MAIL_BASE + 0x68) // DSP -> MEAME
 #define COMMS_BUFFER_START      (MAIL_BASE + 0x6c)
 
-// OP TYPE 0x6c
-// OP1     0x70
-// OP2     0x74
 
-// OP TYPE 0x78
-// OP1     0x7c
-// OP2     0x80
+#define COMMS_MSG_BASE              (MAIL_BASE + 0x200)
+#define COMMS_INSTRUCTIONS_EXECUTED (COMMS_MSG_BASE + 0x0)
+#define COMMS_LAST_OP_TYPE          (COMMS_MSG_BASE + 0x4)
+#define COMMS_LAST_OP_1             (COMMS_MSG_BASE + 0x8)
+#define COMMS_LAST_OP_2             (COMMS_MSG_BASE + 0xc)
+#define COMMS_LAST_ERROR            (COMMS_MSG_BASE + 0x10)
+#define COMMS_LAST_ERROR_VAL        (COMMS_MSG_BASE + 0x14)
 
-// OP TYPE 0x84
-// OP1     0x88
-// OP2     0x8c
 
-// OP TYPE 0x90
-// OP1     0x94
-// OP2     0x98
+#define STIMPACK_MSG_BASE           (MAIL_BASE + 0x300)
+#define STIMPACK_GROUP_DUMPED_GROUP (STIMPACK_MSG_BASE + 0x4)
+#define STIMPACK_GROUP_DAC          (STIMPACK_MSG_BASE + 0x8)
+#define STIMPACK_GROUP_ELECTRODES0  (STIMPACK_MSG_BASE + 0xc)
+#define STIMPACK_GROUP_ELECTRODES1  (STIMPACK_MSG_BASE + 0x10)
+#define STIMPACK_GROUP_PERIOD       (STIMPACK_MSG_BASE + 0x14)
+#define STIMPACK_GROUP_TICK         (STIMPACK_MSG_BASE + 0x18)
+#define STIMPACK_GROUP_SAMPLE       (STIMPACK_MSG_BASE + 0x1c)
+#define STIMPACK_GROUP_FIRES        (STIMPACK_MSG_BASE + 0x20)
 
-// OP TYPE 0x9c
-// OP1     0x100
-// OP2     0x104
 
-// OP TYPE 0x108
-// OP1     0x10c
-// OP2     0x110
+#define STIMPACK_SAMPLE        (STIMPACK_MSG_BASE + 0x24)
+#define STIMPACK_PERIOD        (STIMPACK_MSG_BASE + 0x28)
+#define STIMPACK_ELECTRODES0   (STIMPACK_MSG_BASE + 0x2c)
+#define STIMPACK_ELECTRODES1   (STIMPACK_MSG_BASE + 0x30)
+
+
 
 ////////////////////////////////////////
 ////////////////////////////////////////
