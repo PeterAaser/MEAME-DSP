@@ -11,6 +11,9 @@
 #define STATE_DAC_SEL    7
 #define STATE_MODE       8
 #define BOOKING          9
+#define READ_STIM        10
+#define COMMS_READ_REQ   11
 
-void log(Uint32 logger_id1, Uint32 logger_id2, Uint32 value1, Uint32 value2);
+void MEAME_log(Uint32 logger_id1, Uint32 logger_id2, Uint32 value1, Uint32 value2);
 void log_msg(Uint32 msg);
+void reset_logger();

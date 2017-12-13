@@ -2,6 +2,7 @@
 #include "registers.h"
 // #include "stimpack.h"
 #include "stim_queue.h"
+#include "logger.h"
 
 
 /**
@@ -37,6 +38,8 @@ void setup_trigger() {
 
 void reset_state()
 {
+  reset_logger();
+  reset_comms();
 }
 
 #define SINGLE_SEGMENT 0x10000000
@@ -47,13 +50,14 @@ void reset_state()
 
 void setup()
 {
-
   reset_state();
 
   // With blanking turned off the pulse from an electrode is visible on other
   // sites, useful during development.
   WRITE_REGISTER(BLANKING_EN1, 0x0);
   WRITE_REGISTER(BLANKING_EN2, 0x0);
+
+  setup_stim_queue();
 
   int StimAmplitude = 300;     // in units of 0.571 mV. 40*0.571 = 22.84 mV
   int StimPeriod    = FIRING_PERIOD;
@@ -76,8 +80,6 @@ void setup()
   ////////////////////////////////////////////////////////////////////////////////
 
   setup_trigger();
-  setup_stim_queue();
-  // setup_stimpack();
 
   WRITE_REGISTER(DSP_INDATA_CTRL, DSPINDATACTRL_VALUE);  // Enable Irq and HS1 Data
 }

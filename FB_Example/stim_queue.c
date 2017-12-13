@@ -8,12 +8,14 @@
 #define PRIMED 1
 #define FIRING 2
 
+#define RUNNING 1
+#define HALTED  2
 
 static Uint32 counter = 0;
 static Uint32 canary_counter = 0;
-static Uint32 activated = 0;
+static Uint32 mode = HALTED;
 
-static Uint32 log_counter = 0;
+// static Uint32 log_counter = 0;
 
 // A stimulus request is a data structure holding its period,
 // the requested electrodes for stimuli, and the timestep
@@ -59,7 +61,7 @@ void commit_electrode_config();
 void log_states();
 
 void book_stimulus(stimulus_request* booker){
-  log(BOOKING, booker->idx, 0, counter);
+  MEAME_log(BOOKING, booker->idx, 0, counter);
   Uint32 ii = 0;
   for(ii = 0; ii < 3; ii++){
     if(DAC_pairs[ii].state == IDLE){
@@ -70,11 +72,12 @@ void book_stimulus(stimulus_request* booker){
 }
 
 void run_stim_queue(){
-  if(!activated){
+  if(mode == HALTED){
     return;
   }
-  if(counter == 800*MILLISEC){
-    activated = 0;
+  if(counter >= (800*MILLISEC)){
+    mode = HALTED;
+    return;
   }
 
   int ii = 0;
@@ -92,11 +95,11 @@ void run_stim_queue(){
       if(DAC_pairs[ii].state == IDLE){
       }
       else if(DAC_pairs[ii].state == PRIMED){
-        log(DAC_STATE_CHANGE, ii, PRIMED, counter);
+        MEAME_log(DAC_STATE_CHANGE, ii, PRIMED, counter);
         trigger_DAC_pair(&DAC_pairs[ii]);
       }
       else if (DAC_pairs[ii].state == FIRING){
-        log(DAC_STATE_CHANGE, ii, IDLE, counter);
+        MEAME_log(DAC_STATE_CHANGE, ii, IDLE, counter);
         DAC_pairs[ii].state = IDLE;
       }
     }
@@ -110,7 +113,7 @@ void run_stim_queue(){
 
 void reset_DAC_pair(DAC_pair* p){
 
-  log(CONF, CONF_RESET, p->idx, counter);
+  MEAME_log(CONF, CONF_RESET, p->idx, counter);
 
   log_states();
 
@@ -149,7 +152,7 @@ void reset_DAC_pair(DAC_pair* p){
 
 void configure_DAC_pair(DAC_pair* p, stimulus_request* r){
 
-  log(CONF, CONF_START, p->idx, r->idx);
+  MEAME_log(CONF, CONF_START, p->idx, r->idx);
 
   int mux = p->idx + 1;
   int config = 0;
@@ -188,18 +191,18 @@ void configure_DAC_pair(DAC_pair* p, stimulus_request* r){
 void trigger_DAC_pair(DAC_pair* d){
   Uint32 trigger_value;
   if(d->idx == 0){
-    log(TRIGGER, d->idx, 1, counter);
+    MEAME_log(TRIGGER, d->idx, 1, counter);
     trigger_value = 0x1;
   }
   else if(d->idx == 1){
-    log(TRIGGER, d->idx, 2, counter);
+    MEAME_log(TRIGGER, d->idx, 2, counter);
     trigger_value = 0x2;
   }
   else{
-    log(TRIGGER, d->idx, 4, counter);
+    MEAME_log(TRIGGER, d->idx, 4, counter);
     trigger_value = 0x4;
   }
-  log(DAC_STATE_CHANGE, d->idx, FIRING, counter);
+  MEAME_log(DAC_STATE_CHANGE, d->idx, FIRING, counter);
   d->state = FIRING;
   d->next_state_timestep = (counter + FIRING_PERIOD);
   WRITE_REGISTER(0x0214, trigger_value); // Manually fire trigger
@@ -216,8 +219,11 @@ void commit_electrode_config(){
 // when the period is reduced we want to make sure that the next timestep is at most period steps away
 void read_stim_request(Uint32 group)
 {
+
   Uint32 next_period = READ_REGISTER( STIMPACK_PERIOD );
   Uint32 next_firing_timestep_diff = next_period - stim_reqs[group].period;
+
+  MEAME_log(READ_STIM, group, next_period, counter);
 
   stim_reqs[group].period = next_period;
   stim_reqs[group].next_firing_timestep += next_firing_timestep_diff;
@@ -235,13 +241,14 @@ void read_stim_request(Uint32 group)
 
   read_segment(STIMPACK_ELECTRODES0, 2, stim_reqs[group].electrodes);
 
-  if(group == 3){ activated = 1; }
+  if(group == 3){ mode = RUNNING; }
 }
 
 void setup_stim_queue(){
   int ii;
   for(ii = 0; ii < 3; ii++){
     stim_reqs[ii].active = 0;
+    stim_reqs[ii].idx = ii;
     stim_reqs[ii].period = 0xFFFFFFFF;
     stim_reqs[ii].electrodes[0] = 0;
     stim_reqs[ii].electrodes[1] = 0;
@@ -259,16 +266,16 @@ void setup_stim_queue(){
 }
 
 void log_states(){
-  log(STATE_EN_ELEC, 0, enabled_electrodes[0], counter);
-  log(STATE_EN_ELEC, 1, enabled_electrodes[1], counter);
+  MEAME_log(STATE_EN_ELEC, 0, enabled_electrodes[0], counter);
+  MEAME_log(STATE_EN_ELEC, 1, enabled_electrodes[1], counter);
 
-  log(STATE_DAC_SEL, 0, DAC_select[0], counter);
-  log(STATE_DAC_SEL, 1, DAC_select[1], counter);
-  log(STATE_DAC_SEL, 2, DAC_select[2], counter);
-  log(STATE_DAC_SEL, 3, DAC_select[3], counter);
+  MEAME_log(STATE_DAC_SEL, 0, DAC_select[0], counter);
+  MEAME_log(STATE_DAC_SEL, 1, DAC_select[1], counter);
+  MEAME_log(STATE_DAC_SEL, 2, DAC_select[2], counter);
+  MEAME_log(STATE_DAC_SEL, 3, DAC_select[3], counter);
 
-  log(STATE_MODE, 0, electrode_mode[0], counter);
-  log(STATE_MODE, 1, electrode_mode[1], counter);
-  log(STATE_MODE, 2, electrode_mode[2], counter);
-  log(STATE_MODE, 3, electrode_mode[3], counter);
+  MEAME_log(STATE_MODE, 0, electrode_mode[0], counter);
+  MEAME_log(STATE_MODE, 1, electrode_mode[1], counter);
+  MEAME_log(STATE_MODE, 2, electrode_mode[2], counter);
+  MEAME_log(STATE_MODE, 3, electrode_mode[3], counter);
 }

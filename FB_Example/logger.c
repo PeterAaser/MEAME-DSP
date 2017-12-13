@@ -1,23 +1,29 @@
-#define LOGGING 1
 
 #include "logger.h"
 #include "MEA21_lib.h"
 
-static Uint32 log_counter;
+static Uint32 log_counter = 0;
 
-void log(Uint32 logger_id1, Uint32 logger_id2, Uint32 value1, Uint32 value2){
-#ifdef LOGGING
-  if(((log_counter*4*4) + LOG_BASE) > MAILBOX_END){
-    return;
+void MEAME_log(Uint32 logger_id1, Uint32 logger_id2, Uint32 value1, Uint32 value2){
+
+  WRITE_REGISTER((LOG_BASE + log_counter + 0),  logger_id1);
+  WRITE_REGISTER((LOG_BASE + log_counter + 4),  logger_id2);
+  WRITE_REGISTER((LOG_BASE + log_counter + 8),  value1);
+  WRITE_REGISTER((LOG_BASE + log_counter + 12), value2);
+
+  log_counter = log_counter + 16;
+  WRITE_REGISTER(ENTRIES, log_counter/16);
+
+  if(log_counter == (( MAILBOX_END - LOG_BASE )/4)){
+    log_counter = 0;
   }
+}
 
-  WRITE_REGISTER((LOG_BASE + (4*4*(log_counter + 0))), logger_id1);
-  WRITE_REGISTER((LOG_BASE + (4*4*(log_counter + 1))), logger_id2);
-  WRITE_REGISTER((LOG_BASE + (4*4*(log_counter + 2))), value1);
-  WRITE_REGISTER((LOG_BASE + (4*4*(log_counter + 3))), value2);
-
-  log_counter++;
-  WRITE_REGISTER(ENTRIES, log_counter);
-
-#endif
+void reset_logger(){
+  log_counter = 0;
+  int ii = LOG_BASE;
+  while(ii < MAILBOX_END){
+    WRITE_REGISTER(ii, 0);
+    ii = ii+4;
+  }
 }

@@ -2,6 +2,7 @@
 #include "MEA21_lib.h"
 #include "registers.h"
 #include "stim_queue.h"
+#include "logger.h"
 
 
 // MEAME wants to read value at address
@@ -151,6 +152,7 @@ void handle_reset(){
 
 // Stimulus request has been issued
 void handle_stim_req(Uint32 group_idx){
+  // MEAME_log(COMMS_READ_REQ, COMMS_READ_REQ, group_idx, group_idx);
   read_stim_request(group_idx);
 }
 
@@ -167,3 +169,8 @@ void write_state_to_debug(){
   WRITE_REGISTER(COMMS5, last_op1);
   WRITE_REGISTER(COMMS6, last_op2);
 }
+
+void reset_comms(){
+  WRITE_REGISTER(COMMS_BUFFER_MASTER_IDX, 0);
+  WRITE_REGISTER(COMMS_BUFFER_SLAVE_IDX, 0);
+};
