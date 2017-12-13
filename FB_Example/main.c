@@ -29,9 +29,10 @@ extern void intcVectorTable(void);
 
 #include "comms.h"
 
+// MCS stuff
 char dsp_version[] = "(>)"SW_STRING"(<)";
-
 CSL_GpioRegsOvly gpioRegs = (CSL_GpioRegsOvly)CSL_GPIO_0_REGS;
+///////////////
 
 
 void main()
@@ -43,8 +44,7 @@ void main()
   setup();
 
 
-  while(1)
-    {
-      execute_instructions();
-    }
+  while(1){
+    execute_instructions();
+  }
 }

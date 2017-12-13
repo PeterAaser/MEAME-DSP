@@ -14,6 +14,7 @@ Int32 adc_intern[TOTAL_ANALOG_CHANNELS];
 int threshold;
 int deadtime;
 
-Uint32 StimulusEnable[2];
-Uint32 DAC_select[4];
-Uint32 elec_config[4];
+// commented out by me
+/* Uint32 StimulusEnable[2]; */
+/* Uint32 DAC_select[4]; */
+/* Uint32 elec_config[4]; */

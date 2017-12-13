@@ -1,3 +1,6 @@
+/**
+   MCS shitshow.
+ */
 #ifndef GLOBAL_H_
 #define GLOBAL_H_
 
@@ -36,9 +39,10 @@ extern int threshold;
 extern int deadtime;
 
 
-extern Uint32 StimulusEnable[2];
-extern Uint32 DAC_select[4];
-extern Uint32 elec_config[4];
+// commented out by me
+/* extern Uint32 StimulusEnable[2]; */
+/* extern Uint32 DAC_select[4]; */
+/* extern Uint32 elec_config[4]; */
 
 
 

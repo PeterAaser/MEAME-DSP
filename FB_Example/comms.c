@@ -1,7 +1,7 @@
 #include "comms.h"
 #include "MEA21_lib.h"
 #include "registers.h"
-#include "stimpack.h"
+#include "stim_queue.h"
 
 
 // MEAME wants to read value at address
@@ -15,17 +15,11 @@
 #define  DUMP            3
 #define  RESET           4
 #define  STIM_REQUEST    5
+#define  STIM_DEBUG      6
 
-
-// TODO should be done with defines, but I get a nasty compiler issue
-// this is ofc not good
 #define Q_SIZE 10
 #define instructions_per_segment 3
 #define n_instruction_registers Q_SIZE*instructions_per_segment
-/* static Uint32 Q_SIZE = 10; */
-/* static Uint32 instructions_per_segment = 3; */
-/* static Uint32 n_instruction_registers = 30; */
-
 
 volatile Uint32 comms_buffer_slave_idx = 0;
 volatile Uint32 comms_buffer_master_idx = 0;
@@ -43,7 +37,7 @@ void write_state_to_debug();
 void handle_write_op(Uint32 op2, Uint32 op3);
 void handle_reset();
 void handle_read_op(Uint32 op2, Uint32 op_address);
-void handle_stim_req(Uint32 DAC);
+void handle_stim_req(Uint32 group);
 
 
 void get_master_idx(){
@@ -109,9 +103,13 @@ void execute_instruction(){
   else if(op_type == STIM_REQUEST)
     handle_stim_req(op2);
 
+  else if(op_type == STIM_DEBUG){}
+
   else {
     WRITE_REGISTER(ERROR, 0x2);
     WRITE_REGISTER(ERROR_VAL, op_type);
+    WRITE_REGISTER(ERROR_OP1, op2);
+    WRITE_REGISTER(ERROR_OP2, op3);
   }
 }
 
@@ -143,16 +141,6 @@ void handle_reset(){
   comms_buffer_slave_idx = 0;
   comms_buffer_master_idx = 0;
 
-  WRITE_REGISTER(DEBUG1, 0x0);
-  WRITE_REGISTER(DEBUG2, 0x0);
-  WRITE_REGISTER(DEBUG3, 0x0);
-  WRITE_REGISTER(DEBUG4, 0x0);
-  WRITE_REGISTER(DEBUG5, 0x0);
-  WRITE_REGISTER(DEBUG6, 0x0);
-  WRITE_REGISTER(DEBUG7, 0x0);
-  WRITE_REGISTER(DEBUG8, 0x0);
-  WRITE_REGISTER(DEBUG9, 0x0);
-
   // TODO figure out why this is necessary
   Uint32 count = 0;
   Uint32 guard = n_instruction_registers;
@@ -161,9 +149,9 @@ void handle_reset(){
   }
 }
 
-
-void handle_stim_req(Uint32 DAC){
-  read_stim_request(DAC);
+// Stimulus request has been issued
+void handle_stim_req(Uint32 group_idx){
+  read_stim_request(group_idx);
 }
 
 

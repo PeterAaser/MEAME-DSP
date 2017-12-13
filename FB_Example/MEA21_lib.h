@@ -103,3 +103,9 @@ void MEA21_init();
 
 void SetMonitorSize(int datapoints);
 
+#define SECOND     50000
+#define TENTH      5000
+#define HUNDREDTH  500
+#define MILLISEC   50
+
+#define FIRING_PERIOD ((60*MILLISEC))

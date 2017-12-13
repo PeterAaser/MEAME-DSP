@@ -1,13 +1,14 @@
 #include "setup.h"
 #include "registers.h"
-#include "stimpack.h"
+// #include "stimpack.h"
+#include "stim_queue.h"
 
 
 /**
    TODO: Document me!
  */
-void setup_trigger()
-{
+void setup_trigger() {
+  // TODO: What the fuck is a trigger packet??
   WRITE_REGISTER(0x0200, 0x1);  // Enable Trigger Packets
   WRITE_REGISTER(0x0204, 0x0);  // Setup Trigger
   WRITE_REGISTER(0x0208, 0x0);  // Setup Trigger
@@ -22,10 +23,13 @@ void setup_trigger()
   WRITE_REGISTER(0x0228, 0x0);  // Setup Trigger
   WRITE_REGISTER(0x022c, 0x0);  // Setup Trigger
 
+  // I don't think these are necessary.
   WRITE_REGISTER(0x9190, 1); // Trigger 1 Repeat
   WRITE_REGISTER(0x9194, 1); // Trigger 2 Repeat
   WRITE_REGISTER(0x9198, 1); // Trigger 3 Repeat
 
+  // 0x00020100 = 0b00000000 00000010 00000001 00000000
+  // bits set: 8, 17
   WRITE_REGISTER(0x9104, 0x00020100); // DAC1 to Trigger1, DAC2 to Trigger2, DAC3 to Trigger3
   WRITE_REGISTER(0x9108, 0x00020100); // SBS1 to Trigger1, SBS2 to Trigger2, SBS3 to Trigger3
 }
@@ -33,74 +37,47 @@ void setup_trigger()
 
 void reset_state()
 {
-
-  // TODO figure out why this is necessary
-  int count = 0;
-  int guard = 0x100;
-  for(count = 0; count < guard; count++){
-    WRITE_REGISTER( (MAIL_BASE + (4*count)), 0x0);
-  }
 }
+
+#define SINGLE_SEGMENT 0x10000000
+
+#define DAC_PAIR_1 0
+#define DAC_PAIR_2 2
+#define DAC_PAIR_3 4
 
 void setup()
 {
-  int StimAmplitude;
-  int StimPeriod;
-  int StimRepeats;
-  int StimStepsize;
-
-
-  // TODO: this should be a little smarter...
-  // These values are used in the MCS code block underneath
-  StimAmplitude = 50;
-  StimPeriod    = 1000;
-  StimRepeats   = 1;
-  StimStepsize  = 10;
-
-
-
-
-
-  ////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////
-  //// MCS CODE
-
-  WRITE_REGISTER(DSP_INDATA_CTRL, DSPINDATACTRL_VALUE);  // Enable Irq and HS1 Data
-
-  timer_setup();
-  timer_setperiod(13653332); // 10 Hz timer frequency, blink LED with 5 Hz
-  IER |= 0x80;  // enable CPUINT7 (timer)
-
-  WRITE_REGISTER(0x318, 0x1);  // set AUX 1 as output
-
-  // Set bit 28 to 1
-  //	WRITE_REGISTER(0x9200, 0x10000000; // Inititialze STG Memory, use only one segment
-
-  // Set bit 29 to 1
-  WRITE_REGISTER(0x9200, 0x20000000); // Inititialze STG Memory, use 256 segments
-
-  WRITE_REGISTER(0x0310, 0x0); // set AUX 1 to value 0
-  WRITE_REGISTER(0x0310, 0x1); // set AUX 1 to value one
-
-  SetSegment(0, 0); // select Segment 0 for DAC 1
-  SetSegment(1, 0); // select Segment 0 for Sideband 1
-  UploadSine(0, StimAmplitude, StimPeriod, StimRepeats, StimStepsize);
-  SetSegment(0, 1); // select Segment 1 for DAC 1
-  SetSegment(1, 1); // select Segment 0 for Sideband 1
-  UploadSine(0, StimAmplitude/2, StimPeriod, StimRepeats, StimStepsize);
-
-  WRITE_REGISTER(0x0310, 0x0); // set AUX 1 to value 0
-  ////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////
 
   reset_state();
+
+  // With blanking turned off the pulse from an electrode is visible on other
+  // sites, useful during development.
+  WRITE_REGISTER(BLANKING_EN1, 0x0);
+  WRITE_REGISTER(BLANKING_EN2, 0x0);
+
+  int StimAmplitude = 300;     // in units of 0.571 mV. 40*0.571 = 22.84 mV
+  int StimPeriod    = FIRING_PERIOD;
+  int StimStepsize  = 4;      // step size (resolution) in units of 0.571.
+
+
+  //  Set bit 28 to 1
+  WRITE_REGISTER(0x9200, SINGLE_SEGMENT); // Inititialze STG Memory, use only one segment
+
+  // Upload sines to all 3 SBS/stim pairs
+  // calls god-awful MCS code
+
+  UploadSine(DAC_PAIR_1, StimAmplitude, StimPeriod, 1, StimStepsize);
+  UploadSine(DAC_PAIR_2, StimAmplitude, StimPeriod, 1, StimStepsize);
+  UploadSine(DAC_PAIR_3, StimAmplitude, StimPeriod, 1, StimStepsize);
+
+
+  ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
+
   setup_trigger();
-
-  /* WRITE_REGISTER( ELECTRODES1, 0x0 ); */
-  /* WRITE_REGISTER( ELECTRODES2, 0x0 ); */
-
+  setup_stim_queue();
   // setup_stimpack();
 
+  WRITE_REGISTER(DSP_INDATA_CTRL, DSPINDATACTRL_VALUE);  // Enable Irq and HS1 Data
 }
