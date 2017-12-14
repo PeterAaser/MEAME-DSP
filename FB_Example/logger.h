@@ -13,6 +13,7 @@
 #define BOOKING          9
 #define READ_STIM        10
 #define COMMS_READ_REQ   11
+#define BOOKING_FOUND    12
 
 void MEAME_log(Uint32 logger_id1, Uint32 logger_id2, Uint32 value1, Uint32 value2);
 void log_msg(Uint32 msg);

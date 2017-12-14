@@ -5,6 +5,8 @@
 #include "logger.h"
 
 
+void reset_state();
+
 /**
    TODO: Document me!
  */
@@ -36,10 +38,10 @@ void setup_trigger() {
 }
 
 
-void reset_state()
-{
+void reset_state(){
   reset_logger();
   reset_comms();
+  setup_stim_queue();
 }
 
 #define SINGLE_SEGMENT 0x10000000
@@ -57,7 +59,6 @@ void setup()
   WRITE_REGISTER(BLANKING_EN1, 0x0);
   WRITE_REGISTER(BLANKING_EN2, 0x0);
 
-  setup_stim_queue();
 
   int StimAmplitude = 300;     // in units of 0.571 mV. 40*0.571 = 22.84 mV
   int StimPeriod    = FIRING_PERIOD;

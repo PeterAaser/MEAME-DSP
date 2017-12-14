@@ -15,16 +15,16 @@ static Uint32 counter = 0;
 static Uint32 canary_counter = 0;
 static Uint32 mode = HALTED;
 
+static Uint32 priming_offset = 2000;
 // static Uint32 log_counter = 0;
 
 // A stimulus request is a data structure holding its period,
 // the requested electrodes for stimuli, and the timestep
 // it should fire next.
 
-// At 100 steps before firing the request is "booked" to one of
+// At priming_offes steps before firing the request is "booked" to one of
 // the DAC pairs. This is to ensure that the DAC pair is configured
-// before firing. The timesteps before booking is currently
-// hardcoded to 100 (100 * 20µs = 2ms)
+// before firing.
 struct stimulus_request
 {
   Uint32 idx;
@@ -65,6 +65,7 @@ void book_stimulus(stimulus_request* booker){
   Uint32 ii = 0;
   for(ii = 0; ii < 3; ii++){
     if(DAC_pairs[ii].state == IDLE){
+      MEAME_log(BOOKING_FOUND, booker->idx, ii, counter);
       configure_DAC_pair(&DAC_pairs[ii], booker);
       break;
     }
@@ -75,7 +76,7 @@ void run_stim_queue(){
   if(mode == HALTED){
     return;
   }
-  if(counter >= (800*MILLISEC)){
+  if(counter >= (54000)){
     mode = HALTED;
     return;
   }
@@ -84,9 +85,9 @@ void run_stim_queue(){
 
   for(ii = 0; ii < 4; ii++){
     if(stim_reqs[ii].period == 0){ continue; }
-    if((stim_reqs[ii].next_firing_timestep - counter) == 2000){
+    if((stim_reqs[ii].next_firing_timestep - counter) == priming_offset){
       book_stimulus(&stim_reqs[ii]);
-      stim_reqs[ii].next_firing_timestep += (stim_reqs[ii].period + 100);
+      stim_reqs[ii].next_firing_timestep += stim_reqs[ii].period;
     }
   }
 
@@ -95,7 +96,7 @@ void run_stim_queue(){
       if(DAC_pairs[ii].state == IDLE){
       }
       else if(DAC_pairs[ii].state == PRIMED){
-        MEAME_log(DAC_STATE_CHANGE, ii, PRIMED, counter);
+        MEAME_log(DAC_STATE_CHANGE, ii, FIRING, counter);
         trigger_DAC_pair(&DAC_pairs[ii]);
       }
       else if (DAC_pairs[ii].state == FIRING){
@@ -152,7 +153,7 @@ void reset_DAC_pair(DAC_pair* p){
 
 void configure_DAC_pair(DAC_pair* p, stimulus_request* r){
 
-  MEAME_log(CONF, CONF_START, p->idx, r->idx);
+  MEAME_log(CONF_START, p->idx, r->idx, counter);
 
   int mux = p->idx + 1;
   int config = 0;
@@ -179,7 +180,7 @@ void configure_DAC_pair(DAC_pair* p, stimulus_request* r){
   enabled_electrodes[1] |= r->electrodes[1];
 
   p->state = PRIMED;
-  p->next_state_timestep = counter + 100;
+  p->next_state_timestep = counter + priming_offset;
 
   log_states();
 
@@ -206,7 +207,6 @@ void trigger_DAC_pair(DAC_pair* d){
   d->state = FIRING;
   d->next_state_timestep = (counter + FIRING_PERIOD);
   WRITE_REGISTER(0x0214, trigger_value); // Manually fire trigger
-  WRITE_REGISTER(DEBUG30 + (4*(d->idx)), counter);
 }
 
 void commit_electrode_config(){
@@ -246,7 +246,7 @@ void read_stim_request(Uint32 group)
 
 void setup_stim_queue(){
   int ii;
-  for(ii = 0; ii < 3; ii++){
+  for(ii = 0; ii < 4; ii++){
     stim_reqs[ii].active = 0;
     stim_reqs[ii].idx = ii;
     stim_reqs[ii].period = 0xFFFFFFFF;
@@ -254,15 +254,25 @@ void setup_stim_queue(){
     stim_reqs[ii].electrodes[1] = 0;
     stim_reqs[ii].next_firing_timestep = 0xFFFFFFFF;
   }
-  for(ii = 0; ii < 4; ii++){
+  for(ii = 0; ii < 3; ii++){
     DAC_pairs[ii].electrodes[0] = 0;
     DAC_pairs[ii].electrodes[1] = 0;
 
-    DAC_pairs[ii].idx = 0;
+    DAC_pairs[ii].idx = ii;
     DAC_pairs[ii].state = IDLE;
     DAC_pairs[ii].next_state_timestep = 0xFFFFFFFF;
 
   }
+  enabled_electrodes[0] = 0;
+  enabled_electrodes[1] = 0;
+  DAC_select[0] = 0;
+  DAC_select[1] = 0;
+  DAC_select[2] = 0;
+  DAC_select[3] = 0;
+  electrode_mode[0] = 0;
+  electrode_mode[1] = 0;
+  electrode_mode[2] = 0;
+  electrode_mode[3] = 0;
 }
 
 void log_states(){

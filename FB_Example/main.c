@@ -22,7 +22,6 @@ extern void intcVectorTable(void);
 #include "setup.h"
 #include "timer.h"
 #include "stimulus.h"
-#include "stimpack.h"
 #include "version.h"
 #include "registers.h"
 #include "MEA21_lib.h"
@@ -37,12 +36,8 @@ CSL_GpioRegsOvly gpioRegs = (CSL_GpioRegsOvly)CSL_GPIO_0_REGS;
 
 void main()
 {
-  static int value = 0;
-  volatile int i;
-
   MEA21_init();
   setup();
-
 
   while(1){
     execute_instructions();

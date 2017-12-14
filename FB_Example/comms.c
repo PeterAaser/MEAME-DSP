@@ -173,4 +173,4 @@ void write_state_to_debug(){
 void reset_comms(){
   WRITE_REGISTER(COMMS_BUFFER_MASTER_IDX, 0);
   WRITE_REGISTER(COMMS_BUFFER_SLAVE_IDX, 0);
-};
+}
