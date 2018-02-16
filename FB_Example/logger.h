@@ -15,6 +15,7 @@
 #define READ_STIM        10
 #define COMMS_READ_REQ   11
 #define BOOKING_FOUND    12
+#define STIMULUS_WRITE   13
 
 void MEAME_log(Uint32 count,...);
 void log_msg(Uint32 msg);

@@ -4,13 +4,13 @@
 #include "stim_queue.h"
 #include "logger.h"
 
-#define  DUMP               3
-#define  RESET              4
-#define  STIM_REQUEST       5
-#define  STIM_DEBUG         6
-#define  START_STIM_QUEUE   7
-#define  STOP_STIM_QUEUE    8
-#define  SLOW_MODE          9
+#define  DUMP               1
+#define  RESET              2
+#define  STIM_REQUEST       3
+#define  STIM_DEBUG         4
+#define  START_STIM_QUEUE   5
+#define  STOP_STIM_QUEUE    6
+#define  SLOW_MODE          7
 
 void execute_instruction();
 void signal_slave_idx();

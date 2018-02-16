@@ -2,6 +2,7 @@
 #include "MEA21_lib.h"
 #include <math.h>
 #include "registers.h"
+#include "logger.h"
 
 void AddLoop(int Channel, int Vectors, int Repeats);
 void ClearChannel(int channel);
@@ -18,8 +19,15 @@ int AddDataPoint(int Channel, int duration, int value);
 ////////////////////////////////////////////////////////////////////////////////
 //// MCS CODE
 // [[file:img/mcs_overview.png]]
-void UploadSine(int Channel, int Amplitude, int Period, int Repeats, int Stepsize)
-{
+
+void write_register_logged(Uint32 addr, Uint32 val, Uint32 line){
+  WRITE_REGISTER(addr, val);
+  MEAME_log(4, STIMULUS_WRITE, addr, val, line);
+}
+
+void UploadSine(int Channel, int Amplitude, int Period, int Repeats, int Stepsize){
+
+
   int yold = 0;
   int duration = 0;
   int datapoints = 0;
@@ -32,22 +40,19 @@ void UploadSine(int Channel, int Amplitude, int Period, int Repeats, int Stepsiz
   ClearChannel(Channel);
 
   // Ultra-shitty, Period is in 20µs it seems btw
-  for (i = 0; i < Period; i++)
-    {
-      y = Amplitude * sin((((double)i)/Period)*2*3.1415);
+  for (i = 0; i < Period; i++){
+    y = Amplitude * sin((((double)i)/Period)*2*3.1415);
 
-      if (abs(y - yold) > Stepsize)
-        {
-          vectors_used += AddDataPoint(Channel, duration, yold + OFFSET);
-          datapoints++;
-          yold = y;
-          duration = 1; // 20 us
-        }
-      else
-        {
-          duration++;
-        }
+    if (abs(y - yold) > Stepsize){
+      vectors_used += AddDataPoint(Channel, duration, yold + OFFSET);
+      datapoints++;
+      yold = y;
+      duration = 1; // 20 us
     }
+    else{
+      duration++;
+    }
+  }
 
   vectors_used += AddDataPoint(Channel, duration, yold + OFFSET);
   AddLoop(Channel, vectors_used, Repeats);
@@ -81,21 +86,21 @@ void AddLoop(int Channel, int Vectors, int Repeats)
 
       // The result is a simple for loop
       LoopVector = 0x10000000 | (Repeats << 16) | Vectors;
-      WRITE_REGISTER(ChannelReg, LoopVector);
+      write_register_logged(ChannelReg, LoopVector, __LINE__);
     }
 }
 
 void ClearChannel(int Channel)
 {
   Uint32 ClearReg = 0x920c + Channel*0x20;
-  WRITE_REGISTER(ClearReg, 0);      // Any write to this register clears the Channeldata
+  write_register_logged(ClearReg, 0, __LINE__);      // Any write to this register clears the Channeldata
 }
 
 
 void SetSegment(int Channel, int Segment)
 {
   Uint32 SegmentReg = 0x9200 + Channel*0x20;
-  WRITE_REGISTER(SegmentReg, Segment);  // Any write to this register clears the Channeldata
+  write_register_logged(SegmentReg, Segment, __LINE__);  // Any write to this register clears the Channeldata
 }
 
 
@@ -107,58 +112,56 @@ int AddDataPoint(int Channel, int duration, int value)
   Uint32 ChannelReg = 0x9f20 + Channel*4;
 
   // Adds sine wave points. If the duration bef
-  if (duration > 1000)
-    {
-      // The value is decoded in steps. The first 3 bits (30 - 28) decides how
-      // to interpret the remaining data
-      // 31 - reserverd
-      // 30 - 28:
+  if (duration > 1000){
+    // The value is decoded in steps. The first 3 bits (30 - 28) decides how
+    // to interpret the remaining data
+    // 31 - reserverd
+    // 30 - 28:
 
-      // 000 <- DAC/SBS data vector
-      // 001 Loop pointer vector
-      // 010 Long loop pointer vector
-      // 011 Loop pointer counter vector
-      // 111 END command
+    // 000 <- DAC/SBS data vector
+    // 001 Loop pointer vector
+    // 010 Long loop pointer vector
+    // 011 Loop pointer counter vector
+    // 111 END command
 
-      ////////////////////////////////////////
-      ////////////////////////////////////////
-      // DAC/SBS datavector
-      //
-      // DAC:
-      //
-      // 27: reserved
-      // 26: timebase for repeats
-      // 25 - 16 : Number of repeats in timebase (plus one, thus 0 gives 1 repeat, 4 gives 5 repeats etc)
-      // 15 - 0  :  DAC data value
-      //
-      // SBS:
-      //
-      // 15-8 : Electrode Config ID (for list-mode only)
-      // 4    : Stimulus Select
-      // 3    : Stimulation Switch
-      // 2-1  : reserved(??)
-      // 0    : Amplifier Protection Switch/Blanking
-
-
-      // 00000100 00000000 00000000 00000000 = 0x04000000
-      // Sets bit 26 to 1, setting repeat time-base to 1000 * 20µs
-      Vector = 0x04000000 | (((duration / 1000) - 1) << 16) | (value & 0xffff);
-      WRITE_REGISTER(ChannelReg, Vector);  // Write Datapoint to STG Memory
+    ////////////////////////////////////////
+    ////////////////////////////////////////
+    // DAC/SBS datavector
+    //
+    // DAC:
+    //
+    // 27: reserved
+    // 26: timebase for repeats
+    // 25 - 16 : Number of repeats in timebase (plus one, thus 0 gives 1 repeat, 4 gives 5 repeats etc)
+    // 15 - 0  :  DAC data value
+    //
+    // SBS:
+    //
+    // 15-8 : Electrode Config ID (for list-mode only)
+    // 4    : Stimulus Select
+    // 3    : Stimulation Switch
+    // 2-1  : reserved(??)
+    // 0    : Amplifier Protection Switch/Blanking
 
 
-      duration %= 1000;
-      vectors_used++;
-    }
+    // 00000100 00000000 00000000 00000000 = 0x04000000
+    // Sets bit 26 to 1, setting repeat time-base to 1000 * 20µs
+    Vector = 0x04000000 | (((duration / 1000) - 1) << 16) | (value & 0xffff);
+    write_register_logged(ChannelReg, Vector, __LINE__);  // Write Datapoint to STG Memory
 
-  if (duration > 0)
-    {
-      // (value & 0xffff) sets bits 31 to 16 <- 0
-      // The vector is thus the duration, shifted to bytes 1 and 2, and bytes 3 and 4 containing the value
-      Vector = ((duration - 1) << 16) | (value & 0xffff);
 
-      WRITE_REGISTER(ChannelReg, Vector);  // Write Datapoint to STG Memory
-      vectors_used++;
-    }
+    duration %= 1000;
+    vectors_used++;
+  }
+
+  if (duration > 0){
+    // (value & 0xffff) sets bits 31 to 16 <- 0
+    // The vector is thus the duration, shifted to bytes 1 and 2, and bytes 3 and 4 containing the value
+    Vector = ((duration - 1) << 16) | (value & 0xffff);
+
+    write_register_logged(ChannelReg, Vector, __LINE__);  // Write Datapoint to STG Memory
+    vectors_used++;
+  }
 
   return vectors_used;
 }

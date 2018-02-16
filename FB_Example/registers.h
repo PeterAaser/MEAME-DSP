@@ -43,6 +43,7 @@
 
 #define LOG_START          (0x1100)
 #define LOG_END            (0x1F00)
+#define LOG_ENTRIES        (0x1FF0)
 
 
 ////////////////////////////////////////
