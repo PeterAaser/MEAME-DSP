@@ -15,12 +15,15 @@
 int num_tr_cross[HS1_CHANNELS/2];
 int last_tr_cross[HS1_CHANNELS/2];
 
+int slowmode = 0;
+Uint32 slowdown_factor = 1;
+Uint32 counter = 0;
+
 // use "#define USE_MAILBOX_IRQ" in global.h to enable this interrupt
 // Word of advice, I never got this to consistantly work. Might be
 // fundamentally broken, may just as well be programmer error.
 interrupt void interrupt8(void)
 {
-  // There used to be a lot of code here. Now it's gone
 }
 
 // FPGA data available (do not use)
@@ -31,13 +34,20 @@ interrupt void interrupt4(void)
 // I2C Interrupt
 interrupt void interrupt5(void)
 {
-  //handle_i2c_commands();
 }
 
 // DMA finished Interrupt
 interrupt void interrupt6(void)
 {
-  run_stim_queue();
+
+  if(slowmode){
+    if((counter++ & slowdown_factor) == 0){
+      run_stim_queue();
+    }
+  }
+  else{
+    run_stim_queue();
+  }
 
 
   // No idea.
@@ -46,10 +56,12 @@ interrupt void interrupt6(void)
 }
 
 
-// timer irq
 interrupt void interrupt7(void)
 {
-  /* static int led = 0; */
-  /* CSL_FINS(gpioRegs->OUT_DATA, GPIO_OUT_DATA_OUT2, led); // LED */
-  /* led = 1 - led; */
+}
+
+void set_slow_mode(int set_slowmode, int factor){
+  slowdown_factor = (1 << factor);
+  counter = 0;
+  slowmode = set_slowmode;
 }

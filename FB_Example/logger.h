@@ -1,6 +1,7 @@
 #include "registers.h"
 #include "util.h"
 #include "MEA21_lib.h"
+#include <stdarg.h>
 
 #define DAC_STATE_CHANGE 1
 #define CONF             2
@@ -15,6 +16,6 @@
 #define COMMS_READ_REQ   11
 #define BOOKING_FOUND    12
 
-void MEAME_log(Uint32 logger_id1, Uint32 logger_id2, Uint32 value1, Uint32 value2);
+void MEAME_log(Uint32 count,...);
 void log_msg(Uint32 msg);
 void reset_logger();

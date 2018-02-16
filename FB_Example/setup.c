@@ -68,13 +68,12 @@ void setup()
   //  Set bit 28 to 1
   WRITE_REGISTER(0x9200, SINGLE_SEGMENT); // Inititialze STG Memory, use only one segment
 
+
   // Upload sines to all 3 SBS/stim pairs
   // calls god-awful MCS code
-
   UploadSine(DAC_PAIR_1, StimAmplitude, StimPeriod, 1, StimStepsize);
   UploadSine(DAC_PAIR_2, StimAmplitude, StimPeriod, 1, StimStepsize);
   UploadSine(DAC_PAIR_3, StimAmplitude, StimPeriod, 1, StimStepsize);
-
 
   ////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////

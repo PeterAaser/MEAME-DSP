@@ -8,8 +8,6 @@
 #define PRIMED 1
 #define FIRING 2
 
-#define RUNNING 1
-#define HALTED  2
 
 static Uint32 counter = 0;
 static Uint32 canary_counter = 0;
@@ -56,7 +54,6 @@ Uint32 electrode_mode[4] = {0};
 
 void trigger_DAC_pair(DAC_pair* p);
 void configure_DAC_pair(DAC_pair* p, stimulus_request* r);
-void read_stim_request(Uint32 DAC_idx);
 void commit_electrode_config();
 void log_states();
 
@@ -74,10 +71,6 @@ void book_stimulus(stimulus_request* booker){
 
 void run_stim_queue(){
   if(mode == HALTED){
-    return;
-  }
-  if(counter >= (54000)){
-    mode = HALTED;
     return;
   }
 
@@ -217,10 +210,8 @@ void commit_electrode_config(){
 
 
 // when the period is reduced we want to make sure that the next timestep is at most period steps away
-void read_stim_request(Uint32 group)
+void read_stim_request(Uint32 group, Uint32 next_period, Uint32 elec0, Uint32 elec1)
 {
-
-  Uint32 next_period = READ_REGISTER( STIMPACK_PERIOD );
   Uint32 next_firing_timestep_diff = next_period - stim_reqs[group].period;
 
   MEAME_log(READ_STIM, group, next_period, counter);
@@ -236,12 +227,8 @@ void read_stim_request(Uint32 group)
     stim_reqs[group].next_firing_timestep = counter + stim_reqs[group].period;
   }
 
-  Uint32 elec1 = READ_REGISTER(STIMPACK_ELECTRODES0);
-  Uint32 elec2 = READ_REGISTER(STIMPACK_ELECTRODES1);
-
-  read_segment(STIMPACK_ELECTRODES0, 2, stim_reqs[group].electrodes);
-
-  if(group == 3){ mode = RUNNING; }
+  stim_reqs[group].electrodes[0] = elec0;
+  stim_reqs[group].electrodes[1] = elec1;
 }
 
 void setup_stim_queue(){
@@ -288,4 +275,9 @@ void log_states(){
   MEAME_log(STATE_MODE, 1, electrode_mode[1], counter);
   MEAME_log(STATE_MODE, 2, electrode_mode[2], counter);
   MEAME_log(STATE_MODE, 3, electrode_mode[3], counter);
+}
+
+
+void set_stim_queue_running(Uint32 running){
+  mode = running;
 }

@@ -1,29 +1,27 @@
-
 #include "logger.h"
 #include "MEA21_lib.h"
 
+
 static Uint32 log_counter = 0;
+static Uint32 last_entry = ((LOG_END - LOG_START)/4);
 
-void MEAME_log(Uint32 logger_id1, Uint32 logger_id2, Uint32 value1, Uint32 value2){
+void MEAME_log(Uint32 count,...){
+  if(log_counter > last_entry){
+    return;
+  }
+  WRITE_REGISTER( (LOG_BASE + (log_counter*4)), count);
+  log_counter++;
 
-  WRITE_REGISTER((LOG_BASE + log_counter + 0),  logger_id1);
-  WRITE_REGISTER((LOG_BASE + log_counter + 4),  logger_id2);
-  WRITE_REGISTER((LOG_BASE + log_counter + 8),  value1);
-  WRITE_REGISTER((LOG_BASE + log_counter + 12), value2);
+  va_list ap;
+  int ii;
+  va_start(ap, count);
 
-  log_counter = log_counter + 16;
-  WRITE_REGISTER(ENTRIES, log_counter/16);
-
-  if(log_counter == (( MAILBOX_END - LOG_BASE )/4)){
-    log_counter = 0;
+  for(ii = 0; ii < count; ii++){
+    WRITE_REGISTER( (LOG_BASE + (log_counter*4)), va_arg(ap,ii) );
+    log_counter++;
   }
 }
 
 void reset_logger(){
   log_counter = 0;
-  int ii = LOG_BASE;
-  while(ii < MAILBOX_END){
-    WRITE_REGISTER(ii, 0);
-    ii = ii+4;
-  }
 }

@@ -1,8 +1,7 @@
 #ifndef IRQ_H_
 #define IRQ_H_
 
-//%#define STIM_FREQ = 0x8
-//%#define STIM_FREQ_MAILBOX = 0x1008
+void set_slow_mode(int set_slowmode, int factor);
 
 
 #endif /*IRQ_H_*/

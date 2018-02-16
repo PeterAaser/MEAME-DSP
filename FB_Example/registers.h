@@ -22,153 +22,27 @@
 ////////////////////////////////////////
 ///// MAILBOX
 #define MAIL_BASE          (0x1000)
+#define MAIL_BASE_END      (0x1FFC)
 
-#define COMMS1             (MAIL_BASE + 0xc)
-#define COMMS2             (MAIL_BASE + 0x10)
-#define COMMS3             (MAIL_BASE + 0x14)
-#define COMMS4             (MAIL_BASE + 0x18)
+// When a call is completed the value at 0x1000 should be incremented by 1
+#define INSTRUCTION_ID     (0x1000)
 
-#define COMMS5             (MAIL_BASE + 0x1c)
-#define COMMS6             (MAIL_BASE + 0x20)
+#define INSTRUCTION_TYPE   (0x1004)
 
-#define ERROR              (MAIL_BASE + 0x24)
-#define ERROR_VAL          (MAIL_BASE + 0x28)
-#define ERROR_OP1          (MAIL_BASE + 0x2c)
-#define ERROR_OP2          (MAIL_BASE + 0x30)
+#define STIM_QUEUE_BASE    (0x1008)
+#define STIM_QUEUE_RUNNING (STIM_QUEUE_BASE + 0x0)
 
-#define ENTRIES            (MAIL_BASE + 0x34)
+#define STIM_QUEUE_GROUP   (STIM_QUEUE_BASE + 0x4)
+#define STIM_QUEUE_PERIOD  (STIM_QUEUE_BASE + 0x8)
+#define STIM_QUEUE_ELEC0   (STIM_QUEUE_BASE + 0xc)
+#define STIM_QUEUE_ELEC1   (STIM_QUEUE_BASE + 0x10)
 
-#define DEBUG10            (MAIL_BASE + 0x400)
-#define DEBUG11            (MAIL_BASE + 0x404)
-#define DEBUG12            (MAIL_BASE + 0x408)
-#define DEBUG13            (MAIL_BASE + 0x40c)
-#define DEBUG14            (MAIL_BASE + 0x410)
-#define DEBUG15            (MAIL_BASE + 0x414)
-#define DEBUG16            (MAIL_BASE + 0x418)
-#define DEBUG17            (MAIL_BASE + 0x41c)
-#define DEBUG18            (MAIL_BASE + 0x420)
-#define DEBUG19            (MAIL_BASE + 0x424)
+#define SLOW_MODE_BASE     (STIM_QUEUE_BASE + 0x14)
+#define SLOW_MODE_SETTING  (SLOW_MODE_BASE  + 0x0)
+#define SLOW_MODE_FACTOR   (SLOW_MODE_BASE  + 0x4)
 
-#define DEBUG20            (MAIL_BASE + 0x428)
-#define DEBUG21            (MAIL_BASE + 0x42c)
-#define DEBUG22            (MAIL_BASE + 0x430)
-#define DEBUG23            (MAIL_BASE + 0x434)
-#define DEBUG24            (MAIL_BASE + 0x438)
-#define DEBUG25            (MAIL_BASE + 0x43c)
-#define DEBUG26            (MAIL_BASE + 0x440)
-#define DEBUG27            (MAIL_BASE + 0x444)
-#define DEBUG28            (MAIL_BASE + 0x448)
-#define DEBUG29            (MAIL_BASE + 0x44c)
-
-#define DEBUG30            (MAIL_BASE + 0x450)
-#define DEBUG31            (MAIL_BASE + 0x454)
-#define DEBUG32            (MAIL_BASE + 0x458)
-#define DEBUG33            (MAIL_BASE + 0x45c)
-#define DEBUG34            (MAIL_BASE + 0x460)
-#define DEBUG35            (MAIL_BASE + 0x464)
-#define DEBUG36            (MAIL_BASE + 0x468)
-#define DEBUG37            (MAIL_BASE + 0x46c)
-#define DEBUG38            (MAIL_BASE + 0x470)
-#define DEBUG39            (MAIL_BASE + 0x474)
-
-#define DEBUG40            (MAIL_BASE + 0x478)
-#define DEBUG41            (MAIL_BASE + 0x47c)
-#define DEBUG42            (MAIL_BASE + 0x480)
-#define DEBUG43            (MAIL_BASE + 0x484)
-#define DEBUG44            (MAIL_BASE + 0x488)
-#define DEBUG45            (MAIL_BASE + 0x48c)
-#define DEBUG46            (MAIL_BASE + 0x490)
-#define DEBUG47            (MAIL_BASE + 0x494)
-#define DEBUG48            (MAIL_BASE + 0x498)
-#define DEBUG49            (MAIL_BASE + 0x49c)
-
-#define DEBUG50            (MAIL_BASE + 0x4A0)
-#define DEBUG51            (MAIL_BASE + 0x4A4)
-#define DEBUG52            (MAIL_BASE + 0x4A8)
-#define DEBUG53            (MAIL_BASE + 0x4Ac)
-#define DEBUG54            (MAIL_BASE + 0x4B0)
-#define DEBUG55            (MAIL_BASE + 0x4B4)
-#define DEBUG56            (MAIL_BASE + 0x4B8)
-#define DEBUG57            (MAIL_BASE + 0x4Bc)
-#define DEBUG58            (MAIL_BASE + 0x4C0)
-#define DEBUG59            (MAIL_BASE + 0x4C4)
-
-#define DEBUG60            (MAIL_BASE + 0x4C8)
-#define DEBUG61            (MAIL_BASE + 0x4Cc)
-#define DEBUG62            (MAIL_BASE + 0x4D0)
-#define DEBUG63            (MAIL_BASE + 0x4D4)
-#define DEBUG64            (MAIL_BASE + 0x4D8)
-#define DEBUG65            (MAIL_BASE + 0x4Dc)
-#define DEBUG66            (MAIL_BASE + 0x4E0)
-#define DEBUG67            (MAIL_BASE + 0x4E4)
-#define DEBUG68            (MAIL_BASE + 0x4E8)
-#define DEBUG69            (MAIL_BASE + 0x4Ec)
-
-#define DEBUG70            (MAIL_BASE + 0x4F0)
-#define DEBUG71            (MAIL_BASE + 0x4F4)
-#define DEBUG72            (MAIL_BASE + 0x4F8)
-#define DEBUG73            (MAIL_BASE + 0x4Fc)
-#define DEBUG74            (MAIL_BASE + 0x500)
-#define DEBUG75            (MAIL_BASE + 0x504)
-#define DEBUG76            (MAIL_BASE + 0x508)
-#define DEBUG77            (MAIL_BASE + 0x50c)
-#define DEBUG78            (MAIL_BASE + 0x510)
-#define DEBUG79            (MAIL_BASE + 0x514)
-
-#define DEBUG80            (MAIL_BASE + 0x518)
-#define DEBUG81            (MAIL_BASE + 0x51c)
-#define DEBUG82            (MAIL_BASE + 0x520)
-#define DEBUG83            (MAIL_BASE + 0x524)
-#define DEBUG84            (MAIL_BASE + 0x528)
-#define DEBUG85            (MAIL_BASE + 0x52c)
-#define DEBUG86            (MAIL_BASE + 0x530)
-#define DEBUG87            (MAIL_BASE + 0x534)
-#define DEBUG88            (MAIL_BASE + 0x538)
-#define DEBUG89            (MAIL_BASE + 0x53c)
-
-
-#define WRITTEN_ADDRESS    (MAIL_BASE + 0x50)
-#define COUNTER            (MAIL_BASE + 0x54)
-#define PING_SEND          (MAIL_BASE + 0x58)
-#define PING_READ          (MAIL_BASE + 0x5c)
-
-#define LOG_BASE           (MAIL_BASE + 0x600)
-
-#define MAILBOX_END        (MAIL_BASE + 0xFFC)
-
-
-#define COMMS_BUFFER_MASTER_IDX (MAIL_BASE + 0x64) // MEAME -> DSP
-#define COMMS_BUFFER_SLAVE_IDX  (MAIL_BASE + 0x68) // DSP -> MEAME
-#define COMMS_BUFFER_START      (MAIL_BASE + 0x6c)
-
-
-#define COMMS_MSG_BASE              (MAIL_BASE + 0x200)
-#define COMMS_INSTRUCTIONS_EXECUTED (COMMS_MSG_BASE + 0x0)
-#define COMMS_LAST_OP_TYPE          (COMMS_MSG_BASE + 0x4)
-#define COMMS_LAST_OP_1             (COMMS_MSG_BASE + 0x8)
-#define COMMS_LAST_OP_2             (COMMS_MSG_BASE + 0xc)
-#define COMMS_LAST_ERROR            (COMMS_MSG_BASE + 0x10)
-#define COMMS_LAST_ERROR_VAL        (COMMS_MSG_BASE + 0x14)
-
-
-#define STIMPACK_MSG_BASE           (MAIL_BASE + 0x300)
-#define STIMPACK_GROUP_DUMPED_GROUP (STIMPACK_MSG_BASE + 0x4)
-#define STIMPACK_GROUP_DAC          (STIMPACK_MSG_BASE + 0x8)
-#define STIMPACK_GROUP_ELECTRODES0  (STIMPACK_MSG_BASE + 0xc)
-#define STIMPACK_GROUP_ELECTRODES1  (STIMPACK_MSG_BASE + 0x10)
-#define STIMPACK_GROUP_PERIOD       (STIMPACK_MSG_BASE + 0x14)
-#define STIMPACK_GROUP_TICK         (STIMPACK_MSG_BASE + 0x18)
-#define STIMPACK_GROUP_SAMPLE       (STIMPACK_MSG_BASE + 0x1c)
-#define STIMPACK_GROUP_FIRES        (STIMPACK_MSG_BASE + 0x20)
-
-
-// essentially which trigger should be triggered
-#define STIMPACK_SAMPLE        (STIMPACK_MSG_BASE + 0x24)
-
-#define STIMPACK_PERIOD        (STIMPACK_MSG_BASE + 0x28)
-#define STIMPACK_ELECTRODES0   (STIMPACK_MSG_BASE + 0x2c)
-#define STIMPACK_ELECTRODES1   (STIMPACK_MSG_BASE + 0x30)
-
+#define LOG_START          (0x1100)
+#define LOG_END            (0x1F00)
 
 
 ////////////////////////////////////////
