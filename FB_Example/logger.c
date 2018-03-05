@@ -29,4 +29,5 @@ void MEAME_log(Uint32 count,...){
 
 void reset_logger(){
   log_counter = 0;
+  WRITE_REGISTER(LOG_ENTRIES, log_counter);
 }

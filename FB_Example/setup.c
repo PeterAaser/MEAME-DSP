@@ -60,7 +60,7 @@ void setup()
   WRITE_REGISTER(BLANKING_EN2, 0x0);
 
 
-  int StimAmplitude = 300;     // in units of 0.571 mV. 40*0.571 = 22.84 mV
+  int StimAmplitude = 100;     // in units of 0.571 mV. 100*0.571 = 22.84 mV
   int StimPeriod    = FIRING_PERIOD;
   int StimStepsize  = 4;      // step size (resolution) in units of 0.571.
 
@@ -72,8 +72,8 @@ void setup()
   // Upload sines to all 3 SBS/stim pairs
   // calls god-awful MCS code
   UploadSine(DAC_PAIR_1, StimAmplitude, StimPeriod, 1, StimStepsize);
-  UploadSine(DAC_PAIR_2, StimAmplitude, StimPeriod, 1, StimStepsize);
-  UploadSine(DAC_PAIR_3, StimAmplitude, StimPeriod, 1, StimStepsize);
+  /* UploadSine(DAC_PAIR_2, StimAmplitude, StimPeriod, 1, StimStepsize); */
+  /* UploadSine(DAC_PAIR_3, StimAmplitude, StimPeriod, 1, StimStepsize); */
 
   ////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////

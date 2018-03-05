@@ -40,15 +40,16 @@ interrupt void interrupt5(void)
 interrupt void interrupt6(void)
 {
 
-  if(slowmode){
-    if((counter++ & slowdown_factor) == 0){
-      run_stim_queue();
-    }
-  }
-  else{
-    run_stim_queue();
-  }
+  /* if(slowmode){ */
+  /*   if((counter++ & slowdown_factor) == 0){ */
+  /*     run_stim_queue(); */
+  /*   } */
+  /* } */
+  /* else{ */
+  /*   run_stim_queue(); */
+  /* } */
 
+  run_stim_queue();
 
   // No idea.
   CSL_Edma3ccRegsOvly edma3ccRegs = (CSL_Edma3ccRegsOvly)CSL_EDMA3CC_0_REGS;

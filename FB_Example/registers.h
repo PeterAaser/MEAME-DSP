@@ -21,29 +21,32 @@
 ////////////////////////////////////////
 ////////////////////////////////////////
 ///// MAILBOX
-#define MAIL_BASE          (0x1000)
-#define MAIL_BASE_END      (0x1FFC)
+#define MAIL_BASE             (0x1000)
+#define MAIL_BASE_END         (0x1FFC)
 
 // When a call is completed the value at 0x1000 should be incremented by 1
-#define INSTRUCTION_ID     (0x1000)
+#define SLAVE_INSTRUCTION_ID  (0x1000)
+#define MASTER_INSTRUCTION_ID (0x1004)
 
-#define INSTRUCTION_TYPE   (0x1004)
+#define INSTRUCTION_TYPE      (0x1008)
 
-#define STIM_QUEUE_BASE    (0x1008)
-#define STIM_QUEUE_RUNNING (STIM_QUEUE_BASE + 0x0)
+#define STIM_QUEUE_BASE       (0x100c)
+#define STIM_QUEUE_RUNNING    (STIM_QUEUE_BASE + 0x0)
 
-#define STIM_QUEUE_GROUP   (STIM_QUEUE_BASE + 0x4)
-#define STIM_QUEUE_PERIOD  (STIM_QUEUE_BASE + 0x8)
-#define STIM_QUEUE_ELEC0   (STIM_QUEUE_BASE + 0xc)
-#define STIM_QUEUE_ELEC1   (STIM_QUEUE_BASE + 0x10)
+#define STIM_QUEUE_GROUP      (STIM_QUEUE_BASE + 0x4)
+#define STIM_QUEUE_PERIOD     (STIM_QUEUE_BASE + 0x8)
+#define STIM_QUEUE_ELEC0      (STIM_QUEUE_BASE + 0xc)
+#define STIM_QUEUE_ELEC1      (STIM_QUEUE_BASE + 0x10)
 
-#define SLOW_MODE_BASE     (STIM_QUEUE_BASE + 0x14)
-#define SLOW_MODE_SETTING  (SLOW_MODE_BASE  + 0x0)
-#define SLOW_MODE_FACTOR   (SLOW_MODE_BASE  + 0x4)
+#define STIM_QUEUE_TOGGLE_SG  (STIM_QUEUE_BASE + 0x14)
+#define STIM_QUEUE_TOGGLE_VAL (STIM_QUEUE_BASE + 0x18)
 
-#define LOG_START          (0x1100)
-#define LOG_END            (0x1F00)
-#define LOG_ENTRIES        (0x1FF0)
+#define SLOW_MODE_BASE        (STIM_QUEUE_BASE + 0x1c)
+#define SLOW_MODE_FACTOR      (SLOW_MODE_BASE  + 0x0)
+
+#define LOG_START             (0x1100)
+#define LOG_END               (0x1F00)
+#define LOG_ENTRIES           (0x1FF0)
 
 
 ////////////////////////////////////////
