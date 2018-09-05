@@ -2,6 +2,7 @@
 #include "MEA21_lib.h"
 #include "registers.h"
 #include "stim_queue.h"
+#include "simple_stim.h"
 #include "logger.h"
 
 #define  DUMP               1
@@ -13,7 +14,9 @@
 #define  SLOW_MODE          7
 #define  STIM_GROUP_REQUEST 8
 #define  ENABLE_STIM_GROUP  9
-#define  DUMMY_OP           10 // any op not handled is a dummy op
+
+#define  ENABLE_SIMPLE_STIM 10
+#define  DISABLE_SIMPLE_STIM 11
 
 void execute_instruction();
 void signal_slave_idx();
@@ -140,6 +143,13 @@ void handle_sg_toggle(){
   Uint32 idx = READ_REGISTER(STIM_QUEUE_TOGGLE_SG);
   Uint32 status = READ_REGISTER(STIM_QUEUE_TOGGLE_VAL);
   toggle_stim_queue(idx, status);
+}
+
+void handle_simple_enable(){
+  enable_simple_stim();
+}
+void handle_simple_disable(){
+  disable_simple_stim();
 }
 
 void reset_comms(Uint32 DAC_idx){

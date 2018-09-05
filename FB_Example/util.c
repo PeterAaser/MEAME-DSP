@@ -13,8 +13,17 @@ void modifyRegister(Uint32 reg, Uint32 Mask, Uint32 Value){
 
 // TODO: Likewise
 int get_bit32(Uint32 bits, int index){
-
   return (((bits) >> (index)) & 1);
+}
+
+
+
+UInt32 set_bit(UInt32 word, UInt32 index){
+  return (1 << index) | word;
+}
+
+UInt32 nth_bit(UInt32 index){
+  return (1 << index);
 }
 
 
