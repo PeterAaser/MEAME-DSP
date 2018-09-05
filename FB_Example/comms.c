@@ -12,7 +12,8 @@
 #define  STOP_STIM_QUEUE    6
 #define  SLOW_MODE          7
 #define  STIM_GROUP_REQUEST 8
-#define  ENABLE_STIM_GROUP 9
+#define  ENABLE_STIM_GROUP  9
+#define  DUMMY_OP           10 // any op not handled is a dummy op
 
 void execute_instruction();
 void signal_slave_idx();

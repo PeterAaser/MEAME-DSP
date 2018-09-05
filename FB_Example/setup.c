@@ -1,6 +1,5 @@
 #include "setup.h"
 #include "registers.h"
-// #include "stimpack.h"
 #include "stim_queue.h"
 #include "logger.h"
 
@@ -63,6 +62,8 @@ void setup()
   int StimAmplitude = 100;     // in units of 0.571 mV. 100*0.571 = 22.84 mV
   int StimPeriod    = FIRING_PERIOD;
   int StimStepsize  = 4;      // step size (resolution) in units of 0.571.
+
+  UploadSine(DAC_PAIR_1, StimAmplitude, StimPeriod, 1, StimStepsize);
 
 
   //  Set bit 28 to 1
