@@ -11,26 +11,41 @@ void reset_state();
  */
 void setup_trigger() {
 
-  WRITE_REGISTER(TRIGGER_CTRL1, 0x1);
+  Address trigger_ctrl, trigger1_repeat, trigger2_repeat, trigger3_repeat;
+  trigger_ctrl.v = TRIGGER_CTRL;
+  trigger1_repeat.v = 0x9190;
+  trigger2_repeat.v = 0x9194;
+  trigger3_repeat.v = 0x9198;
+
+  write_register_int(trigger_ctrl, 1);
 
   // Sets the amounts of repeats per trigger
-  WRITE_REGISTER(0x9190, 1); // Trigger 1 Repeats once
-  WRITE_REGISTER(0x9194, 1); // Trigger 2 Repeats once
-  WRITE_REGISTER(0x9198, 1); // Trigger 3 Repeats once
+  write_register_int(trigger1_repeat, 1);
+  write_register_int(trigger2_repeat, 1);
+  write_register_int(trigger3_repeat, 1);
 
+  // assign DAC1 to trigger1, DAC2 to trigger2 and DAC3 to trigger3
+  Word trigger_settings; trigger_settings.v = 0;
+  trigger_settings = set_field(trigger_settings, 16, 2, 2);
+  trigger_settings = set_field(trigger_settings, 8,  2, 1);
+  trigger_settings = set_field(trigger_settings, 0,  2, 0);
 
-  //                              |2 |     |1 |     |0 |
-  // 0x00020100 = 0b00000000 00000010 00000001 00000000
-  // bits set: 8, 17
-  WRITE_REGISTER(0x9104, 0x00020100); // DAC1 to Trigger1, DAC2 to Trigger2, DAC3 to Trigger3
-  WRITE_REGISTER(0x9108, 0x00020100); // SBS1 to Trigger1, SBS2 to Trigger2, SBS3 to Trigger3
+  Address DAC;
+  Address SBS;
+  DAC.v = 0x9104;
+  SBS.v = 0x9108;
+
+  write_register(DAC, trigger_settings);
+  write_register(SBS, trigger_settings);
 
   /**
     From the mouth of madness:
     Setting bit 28 one segment will be set up automaticaly. Setting bit 29 the memory is subdivided into
     256 segments with interal logic.
   */
-  WRITE_REGISTER(0x9200, nth_bit(28)); // Inititialze STG Memory, use only one segment
+  Address mystery_register;
+  mystery_register.v = 0x9200;
+  write_register(mystery_register, nth_bit(28)); // Inititialze STG Memory, use only one segment
 }
 
 
@@ -39,6 +54,7 @@ void reset_state(){
   reset_comms();
   setup_stim_queue();
 }
+
 
 #define DAC_PAIR_1 0
 #define DAC_PAIR_2 2
@@ -50,8 +66,11 @@ void setup()
 
   // With blanking turned off the pulse from an electrode is visible on other
   // sites, useful during development.
-  WRITE_REGISTER(BLANKING_EN1, 0x0);
-  WRITE_REGISTER(BLANKING_EN2, 0x0);
+  Address blanking_en1, blanking_en2;
+  blanking_en1.v = BLANKING_EN1;
+  blanking_en2.v = BLANKING_EN2;
+  write_register_int(blanking_en1, 0);
+  write_register_int(blanking_en2, 0);
 
   setup_trigger();
 
@@ -59,8 +78,6 @@ void setup()
   /* int StimPeriod    = FIRING_PERIOD; */
   /* int StimStepsize  = 4;      // step size (resolution) in units of 0.571. */
   /* UploadSine(DAC_PAIR_1, StimAmplitude, StimPeriod, 1, StimStepsize); */
-
-
 
 
   // Upload sines to all 3 SBS/stim pairs

@@ -21,8 +21,8 @@ int AddDataPoint(int Channel, int duration, int value);
 ////////////////////////////////////////////////////////////////////////////////
 //// MCS CODE
 
-void write_register(Uint32 addr, Uint32 val, Uint32 line){
-  WRITE_REGISTER(addr, val);
+void write_register_(Uint32 addr, Uint32 val, Uint32 line){
+  WRITE_REGISTER_(addr, val);
 
 #ifdef LOGGING
   MEAME_log(4, STIMULUS_WRITE, addr, val, line);
@@ -91,21 +91,21 @@ void AddLoop(int Channel, int Vectors, int Repeats)
 
       // The result is a simple for loop
       LoopVector = 0x10000000 | (Repeats << 16) | Vectors;
-      write_register(ChannelReg, LoopVector, __LINE__);
+      write_register_(ChannelReg, LoopVector, __LINE__);
     }
 }
 
 void ClearChannel(int Channel)
 {
   Uint32 ClearReg = 0x920c + Channel*0x20;
-  write_register(ClearReg, 0, __LINE__);      // Any write to this register clears the Channeldata
+  write_register_(ClearReg, 0, __LINE__);      // Any write to this register clears the Channeldata
 }
 
 
 void SetSegment(int Channel, int Segment)
 {
   Uint32 SegmentReg = 0x9200 + Channel*0x20;
-  write_register(SegmentReg, Segment, __LINE__);  // Any write to this register clears the Channeldata
+  write_register_(SegmentReg, Segment, __LINE__);  // Any write to this register clears the Channeldata
 }
 
 
@@ -152,7 +152,7 @@ int AddDataPoint(int Channel, int duration, int value)
     // 00000100 00000000 00000000 00000000 = 0x04000000
     // Sets bit 26 to 1, setting repeat time-base to 1000 * 20µs
     Vector = 0x04000000 | (((duration / 1000) - 1) << 16) | (value & 0xffff);
-    write_register(ChannelReg, Vector, __LINE__);  // Write Datapoint to STG Memory
+    write_register_(ChannelReg, Vector, __LINE__);  // Write Datapoint to STG Memory
 
 
     duration %= 1000;
@@ -164,7 +164,7 @@ int AddDataPoint(int Channel, int duration, int value)
     // The vector is thus the duration, shifted to bytes 1 and 2, and bytes 3 and 4 containing the value
     Vector = ((duration - 1) << 16) | (value & 0xffff);
 
-    write_register(ChannelReg, Vector, __LINE__);  // Write Datapoint to STG Memory
+    write_register_(ChannelReg, Vector, __LINE__);  // Write Datapoint to STG Memory
     vectors_used++;
   }
 

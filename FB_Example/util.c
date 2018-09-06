@@ -1,36 +1,32 @@
 #include "util.h"
 
-// TODO: Is this MCS shite or is it mine?
-void modifyRegister(Uint32 reg, Uint32 Mask, Uint32 Value){
 
-  Uint32 Temp;
+Word set_field(Word word, int first_bit, int field_size, int field_value){
+  int field = (field_value << first_bit);
+  int mask = (1 << field_size) - 1;
+  int masked = ~((~word.v) | mask);
 
-  Temp = READ_REGISTER(reg);
-  Temp &= ~Mask;
-  Temp |= (Value & Mask);
-  WRITE_REGISTER(reg, Temp);
-}
-
-// TODO: Likewise
-int get_bit32(Uint32 bits, int index){
-  return (((bits) >> (index)) & 1);
+  Word w;
+  w.v = field | masked;
+  return w;
 }
 
 
-
-UInt32 set_bit(UInt32 word, UInt32 index){
-  return (1 << index) | word;
-}
-
-UInt32 nth_bit(UInt32 index){
-  return (1 << index);
+Word set_bit(Word word, int index){
+  Word w;
+  w.v = (1 << index) | word.v;
+  return w;
 }
 
 
-/**
-   Reads 32 bit words from start address into receive buffer
- */
-void read_segment(Uint32 start, int reads, Uint32* recv){
+Word nth_bit(int index){
+  Word w;
+  w.v = (1 << index);
+  return w;
+}
+
+
+void read_segment(int start, int reads, int* recv){
   int ii;
   for (ii = 0; ii < reads; ii++){
     recv[ii] = READ_REGISTER(start + (ii*4));
@@ -38,24 +34,34 @@ void read_segment(Uint32 start, int reads, Uint32* recv){
 }
 
 
-/**
-   Writes 32 bit words to to memory from the send buffer
-*/
-void write_segment(Uint32 start, int writes, Uint32* send){
+void write_segment(int start, int writes, int* send){
   int ii;
   for (ii = 0; ii < writes; ii++){
     WRITE_REGISTER((start + (ii*4)), send[ii]);
   }
 }
 
-void write_byte_segment(Uint32 start, int writes, char* send){
+void write_byte_segment(int start, int writes, char* send){
   int ii;
   for (ii = 0; ii < writes; ii++){
     WRITE_REGISTER((start + ii), send[ii]);
   }
 }
 
-void increment_register(Uint32 address){
-  Uint32 current = READ_REGISTER(address);
-  WRITE_REGISTER(address, current+1);
+void increment_register(Address address){
+  int current = READ_REGISTER(address.v);
+  WRITE_REGISTER(address.v, current+1);
+}
+
+void write_register(Address address, Word word){
+  WRITE_REGISTER(address.v, word.v);
+}
+
+void write_register_int(Address address, int word){
+  WRITE_REGISTER(address.v, word);
+}
+
+int get_bit32(Uint32 bits, int index){
+
+  return (((bits) >> (index)) & 1);
 }
