@@ -4,38 +4,61 @@
 #include "stim_queue.h"
 #include "simple_stim.h"
 #include "logger.h"
+#include "stim_API.h"
 
-#define  DUMP               1
-#define  RESET              2
-#define  STIM_REQUEST       3
-#define  STIM_DEBUG         4
-#define  START_STIM_QUEUE   5
-#define  STOP_STIM_QUEUE    6
-#define  SLOW_MODE          7
-#define  STIM_GROUP_REQUEST 8
-#define  ENABLE_STIM_GROUP  9
+// take a big shit I guess?
+#define  DUMP 1
 
-#define  ENABLE_SIMPLE_STIM 10
-#define  DISABLE_SIMPLE_STIM 11
+// NYI, just reset the device (uhh..)
+#define  RESET 2
+
+// Toggle electrodes on and off for a certain group
+// Takes in two int32 bit fields
+#define  CONFIGURE_ELECTRODE_GROUP 3
+
+// Sets the electrode mode for ALL electrodes.
+// Should be called from the setup function anyways, so safe to ignore
+#define  SET_ELECTRODE_GROUP_MODE_MANUAL 4
+#define  SET_ELECTRODE_GROUP_MODE_AUTO 5
+
+#define  COMMIT_CONFIG 6
+
+// Starts sending out triggers. Once running no configuration is allowed
+#define  START_STIM_QUEUE 7
+#define  STOP_STIM_QUEUE  8
+
+// Sets the frequency of a given group
+#define  SET_ELECTRODE_GROUP_PERIOD 9
+
+// Toggles a given stim group from inactive to active
+#define  ENABLE_STIM_GROUP  10
+#define  DISABLE_STIM_GROUP 11
+
+
+// I dont fucking know man, I just don't want random stack garbage fucking my shit up
+Electrode_config electrode_cfg;
+
 
 void execute_instruction();
 void signal_slave_idx();
 void get_master_idx();
 void write_state_to_debug();
 
-void handle_start_sq();
-void handle_stop_sq();
-void handle_stim_req();
-void handle_reset();
-void handle_stim_group_req();
-void handle_slowmode();
-void handle_sg_toggle();
 
-Uint32 top_instruction_id = 0;
+void handle_dump();
+void handle_reset();
+void handle_configure_electrode_group();
+void handle_commit_config();
+void handle_set_electrode_group_mode(int mode);
+void handle_sq_toggle(int state);
+void handle_set_electrode_group_period();
+void handle_stim_group_toggle(int state);
+
+Int top_instruction_id = 0;
 
 // should be in terms of mod 2
 int check_next_instruction(){
-  Uint32 master_idx = READ_REGISTER(MASTER_INSTRUCTION_ID);
+  Int master_idx = READ_REGISTER(MASTER_INSTRUCTION_ID);
   if(master_idx > top_instruction_id){
     return 1;
   }
@@ -60,101 +83,119 @@ void execute_instructions(){
 
 
 void execute_instruction(){
-  Uint32 op_type = READ_REGISTER(INSTRUCTION_TYPE);
+  Int op_type = READ_REGISTER(INSTRUCTION_TYPE);
 
   MEAME_log(4, COMMS_INSTRUCTION_RECEIVED, op_type, top_instruction_id);
 
   switch(op_type)
     {
-    case STIM_REQUEST :
-      handle_stim_req();
-      break;
-
-    case START_STIM_QUEUE :
-      handle_start_sq();
-      break;
-
-    case STOP_STIM_QUEUE :
-      handle_stop_sq();
-      break;
-
-    case SLOW_MODE :
-      handle_slowmode();
-      break;
-
-    case STIM_GROUP_REQUEST :
-      handle_stim_group_req();
-      break;
-
-    case ENABLE_STIM_GROUP :
-      handle_sg_toggle();
+    case DUMP :
       break;
 
     case RESET :
       handle_reset();
       break;
+
+    case CONFIGURE_ELECTRODE_GROUP :
+      handle_configure_electrode_group();
+      break;
+
+    case SET_ELECTRODE_GROUP_MODE_AUTO :
+      handle_set_electrode_group_mode(AUTO);
+      break;
+
+    case SET_ELECTRODE_GROUP_MODE_MANUAL :
+      handle_set_electrode_group_mode(MANUAL);
+      break;
+
+    case COMMIT_CONFIG :
+      handle_commit_config();
+      break;
+
+    case START_STIM_QUEUE :
+      handle_sq_toggle(RUNNING);
+      break;
+
+    case STOP_STIM_QUEUE :
+      handle_sq_toggle(HALTED);
+      break;
+
+    case SET_ELECTRODE_GROUP_PERIOD :
+      handle_set_electrode_group_period();
+      break;
+
+    case ENABLE_STIM_GROUP :
+      handle_stim_group_toggle(1);
+      break;
+
+    case DISABLE_STIM_GROUP :
+      handle_stim_group_toggle(0);
+      break;
+
   }
 }
 
 
 void handle_reset(){
+  electrode_cfg.enabled_electrodes[0].v = 0;
+  electrode_cfg.enabled_electrodes[1].v = 0;
+  electrode_cfg.DAC_select[0].v = 0;
+  electrode_cfg.DAC_select[1].v = 0;
+  electrode_cfg.DAC_select[2].v = 0;
+  electrode_cfg.DAC_select[3].v = 0;
+  electrode_cfg.electrode_mode[0].v = 0;
+  electrode_cfg.electrode_mode[1].v = 0;
+  electrode_cfg.electrode_mode[2].v = 0;
+  electrode_cfg.electrode_mode[3].v = 0;
+}
 
+
+void handle_dump(){
 }
 
 
 // Stimulus request has been issued
-void handle_stim_req(){
-  Uint32 group_idx = READ_REGISTER(STIM_QUEUE_GROUP);
-  Uint32 period    = READ_REGISTER(STIM_QUEUE_PERIOD);
-  Uint32 elec0     = READ_REGISTER(STIM_QUEUE_ELEC0);
-  Uint32 elec1     = READ_REGISTER(STIM_QUEUE_ELEC1);
+void handle_configure_electrode_group(){
+  Int group_idx = READ_REGISTER(STIM_QUEUE_GROUP);
+  Int elec0     = READ_REGISTER(STIM_QUEUE_ELEC0);
+  Int elec1     = READ_REGISTER(STIM_QUEUE_ELEC1);
 
-  read_stim_request(group_idx, period, elec0, elec1);
+  configure_electrode_group(group_idx, elec0, elec1, &electrode_cfg);
 }
 
-// Stimulus group req issued
-void handle_stim_group_req(){
-  Uint32 group_idx = READ_REGISTER(STIM_QUEUE_GROUP);
-  Uint32 period    = READ_REGISTER(STIM_QUEUE_PERIOD);
+
+// TODO
+void handle_set_electrode_group_mode(int mode){
+}
+
+
+void handle_sq_toggle(int state){
+  set_stim_queue_state(state);
+}
+
+
+void handle_set_electrode_group_period(){
+  int group_idx = READ_REGISTER(STIM_QUEUE_GROUP);
+  int period    = READ_REGISTER(STIM_QUEUE_PERIOD);
 
   read_stim_group_request(group_idx, period);
 }
 
-void handle_stop_sq(){
-  set_stim_queue_running(HALTED);
-}
-void handle_start_sq(){
-  set_stim_queue_running(RUNNING);
+void handle_stim_group_toggle(int state){
+  int group_idx = READ_REGISTER(STIM_QUEUE_TOGGLE_SG);
+
+  toggle_stim_group(group_idx, state);
 }
 
 
-// factor is a power of 2
-void handle_slowmode(){
-  Uint32 factor = READ_REGISTER(SLOW_MODE_FACTOR);
-  if(factor > 1){
-    set_slow_mode(1, factor);
-  }
-  else{
-    set_slow_mode(0, 1);
-  }
-}
-
-void handle_sg_toggle(){
-  Uint32 idx = READ_REGISTER(STIM_QUEUE_TOGGLE_SG);
-  Uint32 status = READ_REGISTER(STIM_QUEUE_TOGGLE_VAL);
-  toggle_stim_queue(idx, status);
-}
-
-void handle_simple_enable(){
-  enable_simple_stim();
-}
-void handle_simple_disable(){
-  disable_simple_stim();
-}
-
-void reset_comms(Uint32 DAC_idx){
+void reset_comms(Int DAC_idx){
   int ii;
   for(ii = 0; ii < 0x1FFC/4; ii++){
     WRITE_REGISTER(MAIL_BASE + (ii*4), 0x0);
   }
+}
+
+
+void handle_commit_config(){
+  commit_config(&electrode_cfg);
 }

@@ -38,11 +38,18 @@
 #define STIM_QUEUE_ELEC0      (STIM_QUEUE_BASE + 0xc)
 #define STIM_QUEUE_ELEC1      (STIM_QUEUE_BASE + 0x10)
 
-#define STIM_QUEUE_TOGGLE_SG  (STIM_QUEUE_BASE + 0x14)
-#define STIM_QUEUE_TOGGLE_VAL (STIM_QUEUE_BASE + 0x18)
+#define CFG_DEBUG_ELEC0       (STIM_QUEUE_BASE + 0x14)
+#define CFG_DEBUG_ELEC1       (STIM_QUEUE_BASE + 0x18)
 
-#define SLOW_MODE_BASE        (STIM_QUEUE_BASE + 0x1c)
-#define SLOW_MODE_FACTOR      (SLOW_MODE_BASE  + 0x0)
+#define CFG_DEBUG_MODE0       (STIM_QUEUE_BASE + 0x1C)
+#define CFG_DEBUG_MODE1       (STIM_QUEUE_BASE + 0x20)
+#define CFG_DEBUG_MODE2       (STIM_QUEUE_BASE + 0x24)
+#define CFG_DEBUG_MODE3       (STIM_QUEUE_BASE + 0x28)
+
+#define CFG_DEBUG_DAC0       (STIM_QUEUE_BASE + 0x2c)
+#define CFG_DEBUG_DAC1       (STIM_QUEUE_BASE + 0x30)
+#define CFG_DEBUG_DAC2       (STIM_QUEUE_BASE + 0x34)
+#define CFG_DEBUG_DAC3       (STIM_QUEUE_BASE + 0x38)
 
 #define LOG_START             (0x1100)
 #define LOG_END               (0x1F00)

@@ -1,20 +1,58 @@
-#include "MEA21_lib.h"
+#ifndef SQ_H
+#define SQ_H
 
-void run_stim_queue();
-void setup_stim_queue();
-void toggle_stim_queue(Uint32 idx, Uint32 status);
+#include "stim_API.h"
 
-void read_stim_request(Uint32 group_idx,
-                       Uint32 period,
-                       Uint32 elec1,
-                       Uint32 elec2);
 
-void read_stim_group_request(Uint32 group, Uint32 next_period);
+/**
+   Stim queue is responsible for maintaining a schedule for firing electrode stimulus
+   triggers.
+   Setup can only be done wrt. electrode timings whereas electrode enable and friends
+   are set using the Stim_API.h header.
+ */
 
-void set_stim_queue_running(Uint32 running);
+/**
+   A stimulus request is a data structure holding its period,
+   the requested electrodes for stimuli, and the timestep
+   it should fire next.
 
-void reset_comms();
+   At priming_offes steps before firing the request is "booked" to one of
+   the DAC pairs. This is to ensure that the DAC pair is configured
+   before firing.
+*/
+typedef struct Stimulus_request
+{
+  int active;
+  int period;
+  int next_firing_timestep;
+} Stimulus_request;
 
-// what the fuck dude
+
+/**
+   Runs one tick, firing stimuli triggers when appropriate
+ */
+io_void run_stim_queue();
+
+
+/**
+   Turn a single stim group on or off.
+ */
+void toggle_stim_group(int idx, int status);
+
+
+/**
+   Read a period change request.
+   Does not toggle a stim group on or off
+ */
+void read_stim_group_request(int group, int next_period);
+
+
+#define HALTED  0
 #define RUNNING 1
-#define HALTED  2
+#define SETUP   2
+void set_stim_queue_state(int state);
+
+// just resets stuff.
+void setup_stim_queue();
+
+#endif // SQ_H
