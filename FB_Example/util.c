@@ -1,9 +1,9 @@
 #include "util.h"
 
-
 Word set_field(Word word, int first_bit, int field_size, int field_value){
   int field = (field_value << first_bit);
   int mask = (1 << field_size) - 1;
+  mask = (mask << first_bit);
   int masked = ~((~word.v) | mask);
 
   Word w;
@@ -54,7 +54,8 @@ void write_segment(int start, int writes, int* send){
 // unsafe due to no typing
 void write_byte_segment(int start, int writes, char* send){
   int ii;
-  for (ii = 0; ii < writes; ii++){
+  for (ii = 0; ii < writes; ii++
+){
     WRITE_REGISTER((start + ii), send[ii]);
   }
 }
