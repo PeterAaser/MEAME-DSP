@@ -5,6 +5,7 @@
 #include "util.h"
 #include "logger.h"
 #include "stimulus.h"
+#include "errors.h"
 
 #define IDLE   0
 #define PRIMED 1
@@ -33,6 +34,12 @@ io_void run_stim_queue(){
     run_group(ii);
   }
 
+  if(step % 4096){
+    Address step_counter;
+    step_counter.v = STEP_COUNTER;
+    increment_register(step_counter);
+  }
+
   step++;
 }
 
@@ -46,8 +53,13 @@ void run_group(int group_idx){
     // just for safety
     if(stim_reqs[group_idx].period == 0){
       stim_reqs[group_idx].active = 0;
+      raise_zero_period_trigger(group_idx, __LINE__);
       return;
     }
+
+    Address shot_counter;
+    shot_counter.v = SHOTS_FIRED;
+    increment_register(shot_counter);
 
     manual_trigger(group_idx);
     stim_reqs[group_idx].next_firing_timestep += stim_reqs[group_idx].period;
@@ -57,6 +69,7 @@ void run_group(int group_idx){
 
 void read_stim_group_request(int group_idx, int next_period){
   if(!in_range(group_idx, 0, 2)){
+    raise_read_request_not_in_range(group_idx, __LINE__);
     return;
   }
 
@@ -76,7 +89,7 @@ void set_stim_queue_state(int state){
 void toggle_stim_group(int group_idx, int status){
 
   if(!in_range(group_idx, 0, 2)){
-    return;
+    raise_read_request_not_in_range(group_idx, __LINE__);
   }
 
   stim_reqs[group_idx].active = status;
@@ -86,6 +99,7 @@ void toggle_stim_group(int group_idx, int status){
     // just for safety
     if(stim_reqs[group_idx].period == 0){
       stim_reqs[group_idx].active = 0;
+      raise_zero_period_trigger(group_idx, __LINE__);
       return;
     }
 

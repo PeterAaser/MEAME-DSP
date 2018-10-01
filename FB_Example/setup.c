@@ -38,9 +38,9 @@ void setup()
   /* int StimStepsize  = 4;      // step size (resolution) in units of 0.571. */
   /* UploadSine(DAC_PAIR_1, StimAmplitude, StimPeriod, 1, StimStepsize); */
 
-#define DAC_PAIR_1 0
-#define DAC_PAIR_2 2
-#define DAC_PAIR_3 4
+  /* #define DAC_PAIR_1 0 */
+  /* #define DAC_PAIR_2 2 */
+  /* #define DAC_PAIR_3 4 */
 
   // Upload sines to all 3 SBS/stim pairs
   // calls god-awful MCS code

@@ -2,10 +2,10 @@
 #include "MEA21_lib.h"
 
 
-static Uint32 log_counter = 0;
-static Uint32 last_entry = ((LOG_END - LOG_START)/4);
+static Int log_counter = 0;
+static Int last_entry = ((LOG_END - LOG_START)/4);
 
-void MEAME_log(Uint32 count,...){
+void MEAME_log(Int count,...){
   if(log_counter > last_entry){
     return;
   }
@@ -17,8 +17,8 @@ void MEAME_log(Uint32 count,...){
   va_start(ap, count);
 
   for(ii = 0; ii < count; ii++){
-    Uint32 huh = LOG_START + (log_counter*4);
-    Uint32 what = va_arg(ap, Uint32);
+    Int huh = LOG_START + (log_counter*4);
+    Int what = va_arg(ap, Uint32);
 
     WRITE_REGISTER(huh,what);
     log_counter++;

@@ -39,16 +39,6 @@ interrupt void interrupt5(void)
 // DMA finished Interrupt
 interrupt void interrupt6(void)
 {
-
-  /* if(slowmode){ */
-  /*   if((counter++ & slowdown_factor) == 0){ */
-  /*     run_stim_queue(); */
-  /*   } */
-  /* } */
-  /* else{ */
-  /*   run_stim_queue(); */
-  /* } */
-
   run_stim_queue();
 
   // No idea.
@@ -57,6 +47,7 @@ interrupt void interrupt6(void)
 }
 
 
+// mystery interrupt!
 interrupt void interrupt7(void)
 {
 }

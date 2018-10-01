@@ -59,5 +59,4 @@ io_void write_register_int(Address address, int word);
 Word read_register(Address address);
 
 int in_range(int i, int min, int max);
-
 #endif // UTIL_H

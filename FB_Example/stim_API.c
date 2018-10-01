@@ -5,11 +5,12 @@
 #include "util.h"
 #include "logger.h"
 #include "stimulus.h"
+#include "errors.h"
 
 
 io_void manual_trigger(int group){
   if(!in_range(group, 0, 2)){
-    // TODO raise error flag
+    raise_manual_trigger_error(group);
     return;
   }
   Address trigger_address;
@@ -87,7 +88,7 @@ void setup_mode_select(int mode, Electrode_config* cfg){
   int ii;
 
   if(!((mode == 0) || (mode == 3))){
-    // TODO raise error flag
+    raise_illegal_mode(mode);
     return;
   }
 
@@ -120,11 +121,12 @@ void configure_electrode_group(int group_idx,
   // 00 = None, 01 = trigger 1 and so forth.
   int trigger_mux = group_idx + 1;
 
+  // Assigns DAC trigger sources to group index for every enabled electrode
   int ii, kk;
   for(ii = 0; ii < 4; ii++){
 
     int electrode_index  = ii/2;
-    int electrode_offset = ii%2;
+    int electrode_offset = (ii%2)*15;
 
     int dac_index = ii;
 
@@ -141,18 +143,38 @@ void configure_electrode_group(int group_idx,
 }
 
 
+io_void __commit_config(Electrode_config* cfg, Address mode_address, Address enable_address, Address DAC_sel_address);
+
 io_void commit_config(Electrode_config* cfg){
+
   Address mode_address, enable_address, DAC_sel_address;
+  mode_address.v    = ELECTRODE_MODE;
+  enable_address.v  = ELECTRODE_ENABLE;
+  DAC_sel_address.v = ELECTRODE_DAC_SEL;
 
-  // live
-  /* mode_address.v    = ELECTRODE_MODE; */
-  /* enable_address.v  = ELECTRODE_ENABLE; */
-  /* DAC_sel_address.v = ELECTRODE_DAC_SEL; */
+  __commit_config(cfg,
+                mode_address,
+                enable_address,
+                DAC_sel_address);
+}
 
-  // debug
+io_void commit_config_debug(Electrode_config* cfg){
+
+  Address mode_address, enable_address, DAC_sel_address;
   mode_address.v    = CFG_DEBUG_MODE0;
   enable_address.v  = CFG_DEBUG_ELEC0;
   DAC_sel_address.v = CFG_DEBUG_DAC0;
+
+  __commit_config(cfg,
+                mode_address,
+                enable_address,
+                DAC_sel_address);
+}
+
+io_void __commit_config(Electrode_config* cfg,
+                       Address mode_address,
+                       Address enable_address,
+                       Address DAC_sel_address){
 
   // Commit electrode mode
   int ii;

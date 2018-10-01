@@ -50,6 +50,7 @@ void setup_mode_select(int mode, Electrode_config* cfg);
 io_void reset_stimulus();
 io_void manual_trigger(int group);
 io_void commit_config(Electrode_config* cfg);
+io_void commit_config_debug(Electrode_config* cfg);
 
 #endif // SAPI_H
 

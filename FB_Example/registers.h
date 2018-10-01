@@ -30,6 +30,7 @@
 
 #define INSTRUCTION_TYPE      (0x1008)
 
+
 #define STIM_QUEUE_BASE       (0x100c)
 #define STIM_QUEUE_RUNNING    (STIM_QUEUE_BASE + 0x0)
 
@@ -50,6 +51,15 @@
 #define CFG_DEBUG_DAC1       (STIM_QUEUE_BASE + 0x30)
 #define CFG_DEBUG_DAC2       (STIM_QUEUE_BASE + 0x34)
 #define CFG_DEBUG_DAC3       (STIM_QUEUE_BASE + 0x38)
+
+#define SHOTS_FIRED          (STIM_QUEUE_BASE + 0x3c)
+
+#define ERROR_FLAG           (STIM_QUEUE_BASE + 0x40)
+#define ERROR_START          (STIM_QUEUE_BASE + 0x44)
+#define ERROR_END            (STIM_QUEUE_BASE + 0x60)
+#define ERROR_ENTRIES        (STIM_QUEUE_BASE + 0x64)
+
+#define STEP_COUNTER         (STIM_QUEUE_BASE + 0x68)
 
 #define LOG_START             (0x1100)
 #define LOG_END               (0x1F00)

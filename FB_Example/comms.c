@@ -34,6 +34,7 @@
 #define  ENABLE_STIM_GROUP  10
 #define  DISABLE_STIM_GROUP 11
 
+#define  COMMIT_CONFIG_DEBUG 12
 
 // I dont fucking know man, I just don't want random stack garbage fucking my shit up
 Electrode_config electrode_cfg;
@@ -49,6 +50,7 @@ void handle_dump();
 void handle_reset();
 void handle_configure_electrode_group();
 void handle_commit_config();
+void handle_commit_config_debug();
 void handle_set_electrode_group_mode(int mode);
 void handle_sq_toggle(int state);
 void handle_set_electrode_group_period();
@@ -112,6 +114,10 @@ void execute_instruction(){
       handle_commit_config();
       break;
 
+    case COMMIT_CONFIG_DEBUG :
+      handle_commit_config_debug();
+      break;
+
     case START_STIM_QUEUE :
       handle_sq_toggle(RUNNING);
       break;
@@ -164,8 +170,15 @@ void handle_configure_electrode_group(){
 }
 
 
-// TODO
 void handle_set_electrode_group_mode(int mode){
+  setup_mode_select(mode, &electrode_cfg);
+
+  MEAME_log(MODE_SET, mode,
+            electrode_cfg.electrode_mode[0].v,
+            electrode_cfg.electrode_mode[1].v,
+            electrode_cfg.electrode_mode[2].v,
+            electrode_cfg.electrode_mode[3].v
+            );
 }
 
 
@@ -182,15 +195,14 @@ void handle_set_electrode_group_period(){
 }
 
 void handle_stim_group_toggle(int state){
-  int group_idx = READ_REGISTER(STIM_QUEUE_TOGGLE_SG);
-
+  int group_idx = READ_REGISTER(STIM_QUEUE_GROUP);
   toggle_stim_group(group_idx, state);
 }
 
 
 void reset_comms(Int DAC_idx){
   int ii;
-  for(ii = 0; ii < 0x1FFC/4; ii++){
+  for(ii = 0; ii < (0x1FFC/4); ii++){
     WRITE_REGISTER(MAIL_BASE + (ii*4), 0x0);
   }
 }
@@ -198,4 +210,8 @@ void reset_comms(Int DAC_idx){
 
 void handle_commit_config(){
   commit_config(&electrode_cfg);
+}
+
+void handle_commit_config_debug(){
+  commit_config_debug(&electrode_cfg);
 }
