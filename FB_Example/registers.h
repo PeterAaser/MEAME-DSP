@@ -61,6 +61,25 @@
 
 #define STEP_COUNTER         (STIM_QUEUE_BASE + 0x68)
 
+#define STIM_REQ1_ACTIVE               (STIM_QUEUE_BASE + 0x6C)
+#define STIM_REQ1_PERIOD               (STIM_QUEUE_BASE + 0x70)
+#define STIM_REQ1_NEXT_FIRING_TIMESTEP (STIM_QUEUE_BASE + 0x74)
+
+#define STIM_REQ2_ACTIVE               (STIM_QUEUE_BASE + 0x78)
+#define STIM_REQ2_PERIOD               (STIM_QUEUE_BASE + 0x7C)
+#define STIM_REQ2_NEXT_FIRING_TIMESTEP (STIM_QUEUE_BASE + 0x80)
+
+#define STIM_REQ3_ACTIVE               (STIM_QUEUE_BASE + 0x84)
+#define STIM_REQ3_PERIOD               (STIM_QUEUE_BASE + 0x88)
+#define STIM_REQ3_NEXT_FIRING_TIMESTEP (STIM_QUEUE_BASE + 0x8C)
+
+#define DEBUG1 (STIM_QUEUE_BASE + 0x90)
+#define DEBUG2 (STIM_QUEUE_BASE + 0x94)
+#define DEBUG3 (STIM_QUEUE_BASE + 0x98)
+#define DEBUG4 (STIM_QUEUE_BASE + 0x9C)
+
+
+
 #define LOG_START             (0x1100)
 #define LOG_END               (0x1F00)
 #define LOG_ENTRIES           (0x1FF0)

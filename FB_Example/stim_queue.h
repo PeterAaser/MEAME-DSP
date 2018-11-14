@@ -55,4 +55,6 @@ void set_stim_queue_state(int state);
 // just resets stuff.
 void setup_stim_queue();
 
+io_void write_sq_state();
+
 #endif // SQ_H

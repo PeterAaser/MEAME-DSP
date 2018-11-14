@@ -10,7 +10,9 @@
 #include "registers.h"
 
 io_void raise_error(int flag){
-  WRITE_REGISTER(ERROR_FLAG, flag);
+  Address debug_addr;
+  debug_addr.v = ERROR_FLAG;
+  write_register_int(debug_addr, flag);
 }
 
 io_void set_error_info(int count,...){
@@ -42,10 +44,10 @@ void raise_illegal_mode(int mode){
 
 void raise_zero_period_trigger(int group_idx, int line){
   raise_error(ZERO_PERIOD_TRIGGER);
-  set_error_info(group_idx, line);
+  /* set_error_info(group_idx, line); */
 }
 
 void raise_read_request_not_in_range(int group_idx, int line){
   raise_error(READ_REQ_OOB);
-  set_error_info(group_idx, line);
+  /* set_error_info(group_idx, line); */
 }

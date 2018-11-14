@@ -35,8 +35,9 @@
 #define  DISABLE_STIM_GROUP 11
 
 #define  COMMIT_CONFIG_DEBUG 12
+#define  WRITE_SQ_DEBUG 13
 
-// I dont fucking know man, I just don't want random stack garbage fucking my shit up
+
 Electrode_config electrode_cfg;
 
 
@@ -55,6 +56,8 @@ void handle_set_electrode_group_mode(int mode);
 void handle_sq_toggle(int state);
 void handle_set_electrode_group_period();
 void handle_stim_group_toggle(int state);
+void handle_write_sq_debug();
+
 
 Int top_instruction_id = 0;
 
@@ -138,6 +141,9 @@ void execute_instruction(){
       handle_stim_group_toggle(0);
       break;
 
+    case WRITE_SQ_DEBUG :
+      handle_write_sq_debug();
+      break;
   }
 }
 
@@ -182,6 +188,7 @@ void handle_set_electrode_group_mode(int mode){
 }
 
 
+// turns the entire stim queue on or off
 void handle_sq_toggle(int state){
   set_stim_queue_state(state);
 }
@@ -194,6 +201,7 @@ void handle_set_electrode_group_period(){
   read_stim_group_request(group_idx, period);
 }
 
+// toggles a single stim group
 void handle_stim_group_toggle(int state){
   int group_idx = READ_REGISTER(STIM_QUEUE_GROUP);
   toggle_stim_group(group_idx, state);
@@ -214,4 +222,8 @@ void handle_commit_config(){
 
 void handle_commit_config_debug(){
   commit_config_debug(&electrode_cfg);
+}
+
+void handle_write_sq_debug(){
+  write_sq_state();
 }

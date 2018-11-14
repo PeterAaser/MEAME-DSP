@@ -78,6 +78,7 @@ void read_stim_group_request(int group_idx, int next_period){
   if(stim_reqs[group_idx].next_firing_timestep <= step){
     stim_reqs[group_idx].next_firing_timestep = step + 1;
   }
+  stim_reqs[group_idx].period = next_period;
 }
 
 
@@ -105,6 +106,8 @@ void toggle_stim_group(int group_idx, int status){
 
     stim_reqs[group_idx].next_firing_timestep = stim_reqs[group_idx].period + step;
   }
+
+  WRITE_REGISTER(DEBUG4, stim_reqs[group_idx].active);
 }
 
 
@@ -114,5 +117,20 @@ void setup_stim_queue(){
     stim_reqs[ii].active = 0;
     stim_reqs[ii].period = 0;
     stim_reqs[ii].next_firing_timestep = 0;
+  }
+}
+
+
+io_void write_sq_state(){
+  Address sq_debug_addr;
+  int ii;
+  sq_debug_addr.v = STIM_REQ1_ACTIVE;
+  for(ii = 0; ii < 3; ii++){
+    write_register_int(sq_debug_addr, stim_reqs[ii].active);
+    sq_debug_addr.v += 4;
+    write_register_int(sq_debug_addr, stim_reqs[ii].period);
+    sq_debug_addr.v += 4;
+    write_register_int(sq_debug_addr, stim_reqs[ii].next_firing_timestep);
+    sq_debug_addr.v += 4;
   }
 }
