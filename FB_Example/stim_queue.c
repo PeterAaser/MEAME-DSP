@@ -50,9 +50,11 @@ void run_group(int group_idx){
 
   if(should_trigger){
 
-    // just for safety
+    // In an electrode has period 0 it is an error, however, in order to allow for the
+    // case where an electrode is toggled befor the period is set, we allow an electrode
+    // to stay active so that it can stimulate once it gets a valid period
     if(stim_reqs[group_idx].period == 0){
-      stim_reqs[group_idx].active = 0;
+      // stim_reqs[group_idx].active = 0;
       raise_zero_period_trigger(group_idx, __LINE__);
       return;
     }
@@ -95,19 +97,24 @@ void toggle_stim_group(int group_idx, int status){
 
   stim_reqs[group_idx].active = status;
 
+  // If the new setting is the same as the old one nothing happens
+  if(status == stim_reqs[group_idx].active)
+    return;
+
   if(status){
 
-    // just for safety
+    // Ensure that no electrode with period 0 is activated
     if(stim_reqs[group_idx].period == 0){
       stim_reqs[group_idx].active = 0;
       raise_zero_period_trigger(group_idx, __LINE__);
       return;
     }
 
-    stim_reqs[group_idx].next_firing_timestep = stim_reqs[group_idx].period + step;
+    // After being toggled, the electrode should fire immediately
+    stim_reqs[group_idx].next_firing_timestep = step + 1;
   }
 
-  WRITE_REGISTER(DEBUG4, stim_reqs[group_idx].active);
+  /* WRITE_REGISTER(DEBUG4, stim_reqs[group_idx].active); */
 }
 
 
